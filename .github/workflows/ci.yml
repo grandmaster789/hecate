@@ -3,11 +3,11 @@ name: Continuous Integration
 on:
   push:
     branches:
-    - master
+    - main
 
   pull_request:
     branches:
-    - master
+    - main
 
 env:
   VCPKG_COMMIT: "b49b2bdf22559c89eddbf29a29621a1dc6929320"
@@ -37,12 +37,7 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    # To enable coverage, delete the last line from the conditional below and
-    # edit the "<name>" placeholder to your GitHub name.
-    # If you do not wish to use codecov, then simply delete this job from the
-    # workflow.
-    if: github.repository_owner == '<name>'
-      && false
+    if: github.repository_owner == 'grandmaster789'
 
     steps:
     - uses: actions/checkout@v2
