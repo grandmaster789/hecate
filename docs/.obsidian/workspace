@@ -4,12 +4,12 @@
     "type": "split",
     "children": [
       {
-        "id": "cd3ce86653bf1892",
+        "id": "e01d9b8fd3deb4e5",
         "type": "leaf",
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Notes.md",
+            "file": "Project setup.md",
             "mode": "source",
             "source": false
           }
@@ -69,7 +69,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Notes.md",
+                "file": "Project setup.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -87,8 +87,9 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "cd3ce86653bf1892",
+  "active": "e01d9b8fd3deb4e5",
   "lastOpenFiles": [
+    "Project setup.md",
     "Notes.md",
     "README.md"
   ]

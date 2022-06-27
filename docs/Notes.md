@@ -2,7 +2,7 @@
 High level goals
 - Multiplatform 'large' project (windows + linux, look into android, ios, mac etc)
 - CMake + vcpkg
-	- Initial project setup via [[https://github.com/friendlyanon/cmake-init]]
+	- Initial project setup via [[https://github.com/friendlyanon/cmake-init]] [[Project setup]]
 - Automated tests
 - Vulkan compute with CPU reference variants
 - Geometric algebra
@@ -19,7 +19,7 @@ High level goals
 	- Based mostly on the Elements library, but fully hardware accelerated
 - Computer vision pipelines
 	- Triangulation
-	- Multi-view stereo
+	- Multi-view stereo [[https://github.com/openMVG/openMVG]]
 	- Voxel carving [[https://github.com/unclearness/vacancy]]
 - Manual design docs via obsidian (yer looking at em)
 	- Math using integrated LaTeX [[https://github.com/joeyuping/quick_latex_obsidian]]
