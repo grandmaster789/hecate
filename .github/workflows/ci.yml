@@ -44,14 +44,14 @@ jobs:
       run: cmake --preset=ci-coverage
 
     - name: Build
-      run: cmake --build build/coverage -j 2
+      run: cmake --build cmake/coverage -j 2
 
     - name: Test
       working-directory: build/coverage
       run: ctest --output-on-failure -j 2
 
     - name: Process coverage info
-      run: cmake --build build/coverage -t coverage
+      run: cmake --build cmake/coverage -t coverage
 
     - name: Submit to codecov.io
       uses: codecov/codecov-action@v1
@@ -65,10 +65,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Install vcpkg
-      uses: friendlyanon/setup-vcpkg@v1
-      with: { committish: "${{ env.VCPKG_COMMIT }}" }
 
     - name: Configure
       env: { CXX: clang++-12 }
@@ -103,10 +99,6 @@ jobs:
     - name: Install static analyzers
       if: matrix.os == 'ubuntu-latest'
       run: sudo apt-get install clang-tidy cppcheck -y -q
-
-    - name: Install vcpkg
-      uses: friendlyanon/setup-vcpkg@v1
-      with: { committish: "${{ env.VCPKG_COMMIT }}" }
 
     - name: Configure
       shell: pwsh
