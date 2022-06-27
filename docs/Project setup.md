@@ -1,0 +1,12 @@
+Initial project setup via cmake-init
+- install python3
+- (elevated) run pip-install cmake-init
+- cmake-init -std 20 --no-clang-tidy --p vcpkg hecate
+- fetch vcpkg.cmake from [[https://github.com/bitmeal/vcpkg-cmake-integration]], put it in /cmake
+- in root CMakeLists.txt, add before 'project':
+	- set(VCPKG_VERSION latest)
+	- include(cmake/vcpkg.cmake)
+- NOTE the generated vcpkg.json uses pinned versions, not latest stable
+- Copy the CMakeUserPresets.json from HACKING.md
+	- Slight edit - set OS to  `win64`
+	- 
