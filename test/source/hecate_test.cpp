@@ -2,8 +2,8 @@
 
 #include "lib.hpp"
 
-TEST_CASE("Name is hecatex", "[library]")
+TEST_CASE("Name is hecate", "[library]")
 {
   auto const lib = library {};
-  REQUIRE(lib.name == "hecatex");
+  REQUIRE(lib.name == "hecate");
 }

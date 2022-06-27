@@ -2,7 +2,7 @@
 # depends on being added from it, i.e. the testing is done only from the build
 # tree and is not feasible from an install location
 
-project(hecatexTests LANGUAGES CXX)
+project(hecateTests LANGUAGES CXX)
 
 # ---- Dependencies ----
 
@@ -11,15 +11,15 @@ include(Catch)
 
 # ---- Tests ----
 
-add_executable(hecatex_test source/hecatex_test.cpp)
+add_executable(hecate_test source/hecate_test.cpp)
 target_link_libraries(
-    hecatex_test PRIVATE
-    hecatex_lib
+    hecate_test PRIVATE
+    hecate_lib
     Catch2::Catch2WithMain
 )
-target_compile_features(hecatex_test PRIVATE cxx_std_20)
+target_compile_features(hecate_test PRIVATE cxx_std_20)
 
-catch_discover_tests(hecatex_test)
+catch_discover_tests(hecate_test)
 
 # ---- End-of-file commands ----
 
