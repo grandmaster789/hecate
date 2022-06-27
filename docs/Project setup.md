@@ -9,4 +9,5 @@ Initial project setup via cmake-init
 - NOTE the generated vcpkg.json uses pinned versions, not latest stable
 - Copy the CMakeUserPresets.json from HACKING.md
 	- Slight edit - set OS to  `win64`
-	- 
+	- Removed spell checking (by default it will also check javascript and try to correct variable names and such)
+	- Removed format checks (I prefer my own formatting)
