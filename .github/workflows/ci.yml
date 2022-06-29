@@ -10,103 +10,33 @@ on:
     - main
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - uses: actions/setup-python@v2
-      with: { python-version: "3.8" }
-
-  coverage:
-    needs: [lint]
-
-    runs-on: ubuntu-latest
-
-    if: github.repository_owner == 'grandmaster789'
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Install LCov
-      run: sudo apt-get update -q
-        && sudo apt-get install lcov -q -y
-
-    - name: Install vcpkg
-      uses: friendlyanon/setup-vcpkg@v1
-      with: { committish: "${{ env.VCPKG_COMMIT }}" }
-
-    - name: Configure
-      run: cmake --preset=ci-coverage
-
-    - name: Build
-      run: cmake --build cmake/coverage -j 2
-
-    - name: Test
-      working-directory: build/coverage
-      run: ctest --output-on-failure -j 2
-
-    - name: Process coverage info
-      run: cmake --build cmake/coverage -t coverage
-
-    - name: Submit to codecov.io
-      uses: codecov/codecov-action@v1
-      with:
-        file: build/coverage/coverage.info
-
-  sanitize:
-    needs: [lint]
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Configure
-      env: { CXX: clang++-12 }
-      run: cmake --preset=ci-sanitize
-
-    - name: Build
-      run: cmake --build build/sanitize -j 2
-
-    - name: Test
-      working-directory: build/sanitize
-      env:
-        ASAN_OPTIONS: "strict_string_checks=1:\
-          detect_stack_use_after_return=1:\
-          check_initialization_order=1:\
-          strict_init_order=1:\
-          detect_leaks=1"
-        UBSAN_OPTIONS: print_stacktrace=1
-      run: ctest --output-on-failure -j 2
-
-  test:
-    needs: [lint]
+  build:
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        os: [windows-2022, ubuntu-latest] # macos-latest
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        build_type: [Debug, Release]
 
-    runs-on: ${{ matrix.os }}
+      env:
+        BUILD_TYPE: {{ matrix.build_type }}
 
-    steps:
-    - uses: actions/checkout@v2
+      steps:
+        - uses: actions/checkout@v2
+          with:
+            submodules: 'recursive'
 
-    - name: Install static analyzers on linux
-      if: matrix.os == 'ubuntu-latest'
-      run: sudo apt-get install clang-tidy cppcheck -y -q
+        - name: Configure CMake
+            # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+            # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+            run: cmake -B ${{runner.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
-    - name: Configure
-      shell: pwsh
-      run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])"
+              - name: Build
+                # Build your program with the given configuration
+                run: cmake --build ${{runner.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-    - name: Build
-      run: cmake --build build --config Release -j 2
-
-    - name: Install
-      run: cmake --install build --config Release --prefix prefix
-
-    - name: Test
-      working-directory: build
-      run: ctest --output-on-failure -C Release -j 2
+              - name: Test
+                working-directory: ${{runner.workspace}}/build
+                # Execute tests defined by the CMake configuration.
+                # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+                run: ctest -C ${{env.BUILD_TYPE}}
