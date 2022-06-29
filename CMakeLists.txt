@@ -1,70 +1,49 @@
 cmake_minimum_required(VERSION 3.14)
 
-include(cmake/prelude.cmake)
+# append "cmake/modules" to the module path
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")
 
-# use cmake to install vcpkg dependency management
+# use cmake itself to install a local vcpkg environment
 # https://github.com/bitmeal/vcpkg-cmake-integration
-set(VCPKG_VERSION latest) # reasonable options: 'latest', 'edge', '<commit-hash>/<tag>'
+set(VCPKG_VERSION latest) # latest == latest release tag, edge == bleeding edge
 include(cmake/vcpkg.cmake)
 
-project(
-    hecate
-    VERSION 0.1.0
-    DESCRIPTION "Vulkan compute testbed"
-    LANGUAGES CXX
-)
+project(hecate)
+string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER) # provide a variable with the project name in lowercase
 
-include(cmake/project-is-top-level.cmake)
-include(cmake/variables.cmake)
+option(UNIT_TESTING "Build unit tests for ${PROJECT_NAME}" ON)
 
-# ---- Declare library ----
+# provide 4 build types (most optimized is MinSizeRel, most debuggable is Debug)
+set(CMAKE_BUILD_TYPE "MinSizeRel" CACHE STRING "Select build type")
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
 
-add_library(
-    hecate_lib OBJECT
-    source/lib.cpp
-)
+# provide centralized flags for all compilers
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-target_include_directories(
-    hecate_lib ${warning_guard}
-    PUBLIC
-    "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>"
-)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-target_compile_features(hecate_lib PUBLIC cxx_std_20)
+# set compiler-specific flags where needed
+if (WIN32)
+  add_compile_definitions(UNICODE)
+  add_compile_definitions(_UNICODE)
+  add_compile_definitions(WIN32_LEAN_AND_MEAN)
+  add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+  add_compile_definitions(_USE_MATH_DEFINES)
+  add_compile_definitions(NOMINMAX)
 
-find_package(fmt REQUIRED)
-target_link_libraries(hecate_lib PRIVATE fmt::fmt)
-
-# ---- Declare executable ----
-
-add_executable(hecate_exe source/main.cpp)
-add_executable(hecate::exe ALIAS hecate_exe)
-
-set_target_properties(
-    hecate_exe PROPERTIES
-    OUTPUT_NAME hecate
-    EXPORT_NAME exe
-)
-
-target_compile_features(hecate_exe PRIVATE cxx_std_20)
-
-target_link_libraries(hecate_exe PRIVATE hecate_lib)
-
-# ---- Install rules ----
-
-if(NOT CMAKE_SKIP_INSTALL_RULES)
-  include(cmake/install-rules.cmake)
+  add_compile_options("/MP")          # build with multiple processes
+  add_compile_options("/W4")          # high warning level
+  add_compile_options("/permissive-") # strict
+  add_compile_options("/utf-8")       # set source code and character sets to UTF-8
 endif()
 
-# ---- Developer mode ----
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/hecate)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/app)
 
-if(NOT hecate_DEVELOPER_MODE)
-  return()
-elseif(NOT PROJECT_IS_TOP_LEVEL)
-  message(
-      AUTHOR_WARNING
-      "Developer mode is intended for developers of hecate"
-  )
+if (UNIT_TESTING)
+  enable_testing()
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test/${PROJECT_NAME})
 endif()
-
-include(cmake/dev-mode.cmake)

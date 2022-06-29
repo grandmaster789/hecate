@@ -3,6 +3,7 @@ High level goals
 - Multiplatform 'large' project (windows + linux, look into android, ios, mac etc)
 - CMake + vcpkg
 	- Initial project setup via [[https://github.com/friendlyanon/cmake-init]] [[Project setup]]
+	- 
 - Automated tests
 - Vulkan compute with CPU reference variants
 - Geometric algebra

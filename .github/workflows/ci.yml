@@ -9,9 +9,6 @@ on:
     branches:
     - main
 
-env:
-  VCPKG_COMMIT: "b49b2bdf22559c89eddbf29a29621a1dc6929320"
-
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -89,14 +86,14 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-2022]
+        os: [windows-2022, ubuntu-latest] # macos-latest
 
     runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install static analyzers
+    - name: Install static analyzers on linux
       if: matrix.os == 'ubuntu-latest'
       run: sudo apt-get install clang-tidy cppcheck -y -q
 
@@ -113,48 +110,3 @@ jobs:
     - name: Test
       working-directory: build
       run: ctest --output-on-failure -C Release -j 2
-
-  docs:
-    # Deploy docs only when builds succeed
-    needs: [sanitize, test]
-
-    runs-on: ubuntu-latest
-
-    # To enable, first you have to create an orphaned gh-pages branch:
-    #
-    #    git switch --orphan gh-pages
-    #    git commit --allow-empty -m "Initial commit"
-    #    git push -u origin gh-pages
-    #
-    # Edit the <name> placeholder below to your GitHub name, so this action
-    # runs only in your repository and no one else's fork. After these, delete
-    # this comment and the last line in the conditional below.
-    # If you do not wish to use GitHub Pages for deploying documentation, then
-    # simply delete this job similarly to the coverage one.
-    if: github.ref == 'refs/heads/master'
-      && github.event_name == 'push'
-      && github.repository_owner == '<name>'
-      && false
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - uses: actions/setup-python@v2
-      with: { python-version: "3.8" }
-
-    - name: Install m.css dependencies
-      run: pip3 install jinja2 Pygments
-
-    - name: Install Doxygen
-      run: sudo apt-get update -q
-        && sudo apt-get install doxygen -q -y
-
-    - name: Build docs
-      run: cmake "-DPROJECT_SOURCE_DIR=$PWD" "-DPROJECT_BINARY_DIR=$PWD/build"
-        -P cmake/docs-ci.cmake
-
-    - name: Deploy docs
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: build/docs/html
