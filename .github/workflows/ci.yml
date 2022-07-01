@@ -31,10 +31,11 @@ jobs:
           compiler: llvm
           gcov_executable: "llvm-cov gcov"
 
-        - name: Macos Clang
-          os: macos-latest
-          compiler: llvm
-          gcov_executable: "llvm-cov gcov"
+        # Seems like the vcpkg.cmake script doesn't work on mac...
+        #- name: Macos Clang
+        #  os: macos-latest
+        #  compiler: llvm
+        #  gcov_executable: "llvm-cov gcov"
 
         - name: Windows MSVC
           os: windows-latest
