@@ -13,7 +13,7 @@ tasks:
 
   # Execute the app or the tests
   run_template:
-    - cd build/bin && ctest -C {{.CMAKE_BUILD_TYPE}} --output-on-failure
+    - cd bin && ctest -C {{.CMAKE_BUILD_TYPE}} --output-on-failure
 
   # Run with coverage analysis
   coverage_template:
