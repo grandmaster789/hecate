@@ -1,7 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
-# 
+#
 # Copyright (C) 2021, Arne Wendt
 #
 
@@ -17,7 +17,7 @@ cmake_minimum_required(VERSION 3.0.0)
 #       may be necessary on some systems as downloaded binaries may be linked against unsupported libraries
 #       musl-libc based distros (ALPINE)(!) require use of system binaries, but are AUTO DETECTED!
 # - VCPKG_FEATURE_FLAGS: modify feature flags; default are "manifests,versions"
-# 
+#
 # - VCPKG_NO_INIT: do not call vcpkg_init() automatically (for use testing)
 
 
@@ -40,7 +40,7 @@ find_package(Git REQUIRED)
 # get VCPKG
 function(vcpkg_init)
     # set environment (not cached)
-    
+
     # mask musl-libc if masked prior
     if(VCPKG_MASK_MUSL_LIBC)
         vcpkg_mask_if_musl_libc()
@@ -65,9 +65,9 @@ function(vcpkg_init)
 
         # mask musl-libc if no triplet is provided
         if(
-            ( ENV{VCPKG_DEFAULT_TRIPLET} EQUAL "" OR NOT DEFINED ENV{VCPKG_DEFAULT_TRIPLET}) AND
-            ( ENV{VCPKG_DEFAULT_HOST_TRIPLET} EQUAL "" OR NOT DEFINED ENV{VCPKG_DEFAULT_HOST_TRIPLET}) AND
-            ( VCPKG_TARGET_TRIPLET EQUAL "" OR NOT DEFINED VCPKG_TARGET_TRIPLET)
+        ( ENV{VCPKG_DEFAULT_TRIPLET} EQUAL "" OR NOT DEFINED ENV{VCPKG_DEFAULT_TRIPLET}) AND
+        ( ENV{VCPKG_DEFAULT_HOST_TRIPLET} EQUAL "" OR NOT DEFINED ENV{VCPKG_DEFAULT_HOST_TRIPLET}) AND
+        ( VCPKG_TARGET_TRIPLET EQUAL "" OR NOT DEFINED VCPKG_TARGET_TRIPLET)
         )
             # mask musl-libc from vcpkg
             vcpkg_mask_if_musl_libc()
@@ -75,7 +75,7 @@ function(vcpkg_init)
             message(WARNING "One of VCPKG_TARGET_TRIPLET, ENV{VCPKG_DEFAULT_TRIPLET} or ENV{VCPKG_DEFAULT_HOST_TRIPLET} has been defined. NOT CHECKING FOR musl-libc MASKING!")
         endif()
 
-    
+
         # test options
         if(VCPKG_PARENT_DIR EQUAL "" OR NOT DEFINED VCPKG_PARENT_DIR)
             message(STATUS "VCPKG from: ${CMAKE_CURRENT_BINARY_DIR}")
@@ -85,7 +85,7 @@ function(vcpkg_init)
 
         # set varible to expected path; necessary to detect after a CMake cache clean
         vcpkg_set_vcpkg_executable()
-    
+
         # executable is present ? configuring done : fetch and build
         execute_process(COMMAND ${VCPKG_EXECUTABLE} version RESULT_VARIABLE VCPKG_TEST_RETVAL OUTPUT_VARIABLE VCPKG_VERSION_BANNER)
         if(NOT VCPKG_TEST_RETVAL EQUAL "0")
@@ -101,7 +101,7 @@ function(vcpkg_init)
             else()
                 set(VCPKG_BUILD_CMD "./bootstrap-vcpkg.sh")
             endif()
-        
+
             # prepare and clone git sources
             # include(FetchContent)
             # set(FETCHCONTENT_QUIET on)
@@ -134,7 +134,7 @@ function(vcpkg_init)
                     message(FATAL_ERROR "Cloning VCPKG repository from https://github.com/microsoft/vcpkg failed!")
                 endif()
             endif()
-            
+
             # compute git checkout target
             vcpkg_set_version_checkout()
 
@@ -181,7 +181,7 @@ function(vcpkg_init)
 
         # cache executable path
         set(VCPKG_EXECUTABLE ${VCPKG_EXECUTABLE} CACHE STRING "vcpkg executable path" FORCE)
-    
+
         # set toolchain
         set(CMAKE_TOOLCHAIN_FILE "${VCPKG_PARENT_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake")
         set(CMAKE_TOOLCHAIN_FILE ${CMAKE_TOOLCHAIN_FILE} PARENT_SCOPE)
@@ -277,8 +277,8 @@ function(vcpkg_get_set_musl_libc)
             string(FIND "${VCPKG_PLATFORM_LDD_VERSION_STDOUT}" "musl" VCPKG_PLATFORM_LDD_FIND_MUSL_STDOUT)
             string(FIND "${VCPKG_PLATFORM_LDD_VERSION_STDERR}" "musl" VCPKG_PLATFORM_LDD_FIND_MUSL_STDERR)
             if(
-                (VCPKG_PLATFORM_LDD_OK EQUAL "0" AND NOT VCPKG_PLATFORM_LDD_FIND_MUSL_STDOUT EQUAL "-1") OR
-                (NOT VCPKG_PLATFORM_LDD_OK EQUAL "0" AND NOT VCPKG_PLATFORM_LDD_FIND_MUSL_STDERR EQUAL "-1")
+            (VCPKG_PLATFORM_LDD_OK EQUAL "0" AND NOT VCPKG_PLATFORM_LDD_FIND_MUSL_STDOUT EQUAL "-1") OR
+            (NOT VCPKG_PLATFORM_LDD_OK EQUAL "0" AND NOT VCPKG_PLATFORM_LDD_FIND_MUSL_STDERR EQUAL "-1")
             )
                 # has musl-libc
                 # use system binaries
@@ -305,8 +305,8 @@ function(vcpkg_mask_musl_libc)
     string(FIND "${VCPKG_PLATFORM_LDD_VERSION_STDOUT}" "x86_64" VCPKG_PLATFORM_LDD_FIND_MUSL_BITS_STDOUT)
     string(FIND "${VCPKG_PLATFORM_LDD_VERSION_STDERR}" "x86_64" VCPKG_PLATFORM_LDD_FIND_MUSL_BITS_STDERR)
     if(
-        NOT VCPKG_PLATFORM_LDD_FIND_MUSL_BITS_STDOUT EQUAL "-1" OR
-        NOT VCPKG_PLATFORM_LDD_FIND_MUSL_BITS_STDERR EQUAL "-1"
+            NOT VCPKG_PLATFORM_LDD_FIND_MUSL_BITS_STDOUT EQUAL "-1" OR
+            NOT VCPKG_PLATFORM_LDD_FIND_MUSL_BITS_STDERR EQUAL "-1"
     )
         set(VCPKG_TARGET_TRIPLET "x64-linux")
     else()
@@ -376,7 +376,7 @@ endfunction()
 #     if(VCPKG_TARGET_TRIPLET STREQUAL "" OR NOT DEFINED VCPKG_TARGET_TRIPLET)
 #         vcpkg_make_set_triplet()
 #     endif()
-#     
+#
 #     message(STATUS "VCPKG: install from manifest; using target triplet: ${VCPKG_TARGET_TRIPLET}")
 #     execute_process(COMMAND ${VCPKG_EXECUTABLE} --triplet=${VCPKG_TARGET_TRIPLET} --feature-flags=manifests,versions --disable-metrics install WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} RESULT_VARIABLE VCPKG_INSTALL_OK)
 #     if(NOT VCPKG_INSTALL_OK EQUAL "0")

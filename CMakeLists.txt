@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.15)
 
+include(cmake/StandardSettings.cmake)
+include(cmake/StaticAnalyzers.cmake)
+
 # use cmake to install vcpkg dependency management
-# https://github.com/bitmeal/vcpkg-cmake-integration
-set(VCPKG_VERSION latest) # latest == latest release tag, edge == bleeding edge
+set(VCPKG_VERSION latest)
 include(cmake/vcpkg.cmake)
 
 # make a single reference to the project name
