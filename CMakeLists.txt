@@ -20,6 +20,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project(${This} CXX)
 
 if (WIN32)
+	set(HECATE_WINDOWS 1)
+
 	add_definitions(-DUNICODE -D_UNICODE)
 	add_definitions(-DWIN32_LEAN_AND_MEAN)
 	#add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)

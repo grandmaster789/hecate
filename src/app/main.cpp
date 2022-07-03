@@ -2,8 +2,13 @@
 
 #include "hecate.h"
 
-int main() {
-  std::cout << "Ping\n";
+int main(
+	int   argc, 
+	char* argv[]
+) {
+	hecate::App app(argc, argv, "Dummy");
 
-  std::cout << "SQ: " << hecate::square(5) << "\n";
+	app.run();
+
+	return 0;
 }

@@ -1,8 +1,8 @@
-#ifndef HECATE_HECATE_H
-#define HECATE_HECATE_H
+#pragma once
 
-namespace hecate {
-  int square(int x);
-}
+// NOTE this should only be included *outside* of the HecateLib project
 
-#endif  // HECATE_HECATE_H
+#include "core/engine.h"
+#include "core/app.h"
+#include "core/resources.h"
+

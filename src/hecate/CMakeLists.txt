@@ -42,15 +42,34 @@ elseif(APPLE)
 endif()
 
 add_library(
-        HecateLib
+    HecateLib
 
-        hecate.cpp
-)
+    "hecate.cpp"
+     
+    
+     
+    
+    
+
+    $<${HECATE_WINDOWS}:${CMAKE_CURRENT_SOURCE_DIR}/host/windows/app_windows.cpp>
+    $<${HECATE_WINDOWS}:${CMAKE_CURRENT_SOURCE_DIR}/host/windows/resources_windows.cpp>
+     )
 
 find_package(fmt CONFIG REQUIRED)
+
+find_path(VULKAN_HPP_INCLUDE_DIRS "vulkan/vulkan.hpp")
+
+target_include_directories(
+    HecateLib PRIVATE 
+    ${VULKAN_HPP_INCLUDE_DIRS}
+)
 
 target_link_libraries(
         HecateLib PRIVATE
 
         fmt::fmt
 )
+
+if (WIN32)
+    target_link_libraries(HecateLib PUBLIC Shcore)
+endif()
