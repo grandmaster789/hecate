@@ -1,70 +1,48 @@
-cmake_minimum_required(VERSION 3.14)
-
-include(cmake/prelude.cmake)
+cmake_minimum_required(VERSION 3.15)
 
 # use cmake to install vcpkg dependency management
 # https://github.com/bitmeal/vcpkg-cmake-integration
-set(VCPKG_VERSION latest) # reasonable options: 'latest', 'edge', '<commit-hash>/<tag>'
+set(VCPKG_VERSION latest) # latest == latest release tag, edge == bleeding edge
 include(cmake/vcpkg.cmake)
 
-project(
-    hecate
-    VERSION 0.1.0
-    DESCRIPTION "Vulkan compute testbed"
-    LANGUAGES CXX
-)
+# make a single reference to the project name
+# if you don't do this, it becomes more work 
+# to copy this cmakelists.txt to another project
+set(This hecate)
 
-include(cmake/project-is-top-level.cmake)
-include(cmake/variables.cmake)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-# ---- Declare library ----
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-add_library(
-    hecate_lib OBJECT
-    source/lib.cpp
-)
+project(${This} CXX)
 
-target_include_directories(
-    hecate_lib ${warning_guard}
-    PUBLIC
-    "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>"
-)
-
-target_compile_features(hecate_lib PUBLIC cxx_std_20)
-
-find_package(fmt REQUIRED)
-target_link_libraries(hecate_lib PRIVATE fmt::fmt)
-
-# ---- Declare executable ----
-
-add_executable(hecate_exe source/main.cpp)
-add_executable(hecate::exe ALIAS hecate_exe)
-
-set_target_properties(
-    hecate_exe PROPERTIES
-    OUTPUT_NAME hecate
-    EXPORT_NAME exe
-)
-
-target_compile_features(hecate_exe PRIVATE cxx_std_20)
-
-target_link_libraries(hecate_exe PRIVATE hecate_lib)
-
-# ---- Install rules ----
-
-if(NOT CMAKE_SKIP_INSTALL_RULES)
-  include(cmake/install-rules.cmake)
+if (WIN32)
+	add_definitions(-DUNICODE -D_UNICODE)
+	add_definitions(-DWIN32_LEAN_AND_MEAN)
+	#add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
+	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+	add_definitions(-D_USE_MATH_DEFINES)
+	add_definitions(-DNOMINMAX)
+	
+	add_compile_options("/MP")          # build with multiple processes
+	add_compile_options("/W4")          # high warning level warnings
+	add_compile_options("/permissive-") # strict adherence to the c++ standard
+	add_compile_options("/utf-8")       # set source and executable character sets to UTF-8
 endif()
 
-# ---- Developer mode ----
+# -----------------------------------------------------------------
+option(ENABLE_TESTING "Enable Test Builds" ON)
 
-if(NOT hecate_DEVELOPER_MODE)
-  return()
-elseif(NOT PROJECT_IS_TOP_LEVEL)
-  message(
-      AUTHOR_WARNING
-      "Developer mode is intended for developers of hecate"
-  )
+# -----------------------------------------------------------------
+# the actual application
+
+add_subdirectory("src/app")
+add_subdirectory("src/hecate")
+
+if (ENABLE_TESTING)
+	enable_testing()
+	add_subdirectory("test/${PROJECT_NAME}")
 endif()
-
-include(cmake/dev-mode.cmake)

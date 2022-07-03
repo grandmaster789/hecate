@@ -1,23 +1,10 @@
 {
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
   "name": "hecate",
   "version-semver": "0.1.0",
   "dependencies": [
-    {
-      "name": "fmt",
-      "version>=": "8.1.1#1"
-    }
+    { "name": "fmt",    "version>=": "8.1.1#1" },
+    { "name": "catch2", "version>=": "3.0.1#1" }
   ],
-  "default-features": [],
-  "features": {
-    "test": {
-      "description": "Dependencies for testing",
-      "dependencies": [
-        {
-          "name": "catch2",
-          "version>=": "3.0.1#1"
-        }
-      ]
-    }
-  },
   "builtin-baseline": "bae8f8c7d837c631ca72daec4b14e243824135a5"
 }
