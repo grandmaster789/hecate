@@ -3,8 +3,9 @@
   "name": "hecate",
   "version-semver": "0.1.0",
   "dependencies": [
-    { "name": "fmt",    "version>=": "8.1.1#1" },
-    { "name": "catch2", "version>=": "3.0.1#1" }
+    { "name": "fmt",        "version>=": "8.1.1#1" },
+    { "name": "catch2",     "version>=": "3.0.1#1" },
+    { "name": "vulkan-hpp", "version>=": "1.2.203" }
   ],
   "builtin-baseline": "bae8f8c7d837c631ca72daec4b14e243824135a5"
 }
