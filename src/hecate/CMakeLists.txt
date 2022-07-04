@@ -45,15 +45,7 @@ add_library(
     HecateLib
 
     "hecate.cpp"
-     
-    
-     
-    
-    
-
-    $<${HECATE_WINDOWS}:${CMAKE_CURRENT_SOURCE_DIR}/host/windows/app_windows.cpp>
-    $<${HECATE_WINDOWS}:${CMAKE_CURRENT_SOURCE_DIR}/host/windows/resources_windows.cpp>
-     )
+  "os/window.h" "graphics/surface.h" "graphics/surface_state.h" "graphics/surface_state.cpp" "graphics/device.h")
 
 find_package(fmt CONFIG REQUIRED)
 
