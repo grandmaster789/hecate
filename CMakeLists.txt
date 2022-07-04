@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.15)
 include(cmake/StandardSettings.cmake)
 include(cmake/StaticAnalyzers.cmake)
 
+# try to find vulkan
+include(cmake/vulkan.cmake)
+
 # use cmake to install vcpkg dependency management
 set(VCPKG_VERSION latest)
 include(cmake/vcpkg.cmake)
