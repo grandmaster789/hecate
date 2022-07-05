@@ -4,7 +4,7 @@ include(cmake/StandardSettings.cmake)
 include(cmake/StaticAnalyzers.cmake)
 
 # try to find vulkan
-include(cmake/vulkan.cmake)
+#include(cmake/vulkan.cmake)
 
 # use cmake to install vcpkg dependency management
 set(VCPKG_VERSION latest)
@@ -30,7 +30,6 @@ if (WIN32)
 	#add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 	add_definitions(-D_USE_MATH_DEFINES)
-	add_definitions(-DNOMINMAX)
 	
 	add_compile_options("/MP")          # build with multiple processes
 	add_compile_options("/W4")          # high warning level warnings

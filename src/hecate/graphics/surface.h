@@ -11,8 +11,8 @@ namespace hecate::graphics {
 		Surface& operator = (Surface&&) noexcept = delete;
 
 		virtual       void    init() {}
-		virtual       void    set_device(Device* d) noexcept;
-		[[nodiscard]] Device* get_device() const noexcept;
+		//virtual       void    set_device(Device* d) noexcept;
+		//[[nodiscard]] Device* get_device() const noexcept;
 
 	protected:
 
