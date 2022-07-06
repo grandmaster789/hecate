@@ -1,7 +1,6 @@
 #include "system.h"
 #include "engine.h"
 #include "../util/algorithm.h"
-#include "../util/threads.h"
 #include "logger.h"
 
 namespace hecate::core {
@@ -33,7 +32,7 @@ namespace hecate::core {
 		return m_Settings;
 	}
 
-	void System::add_dependency(std::string_view system_name) {
+	void System::add_dependency(const std::string& system_name) {
 		if (!util::contains(m_Dependencies, system_name))
 			m_Dependencies.push_back(std::string(system_name));
 		else

@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
 
-include(cmake/StandardSettings.cmake)
-include(cmake/StaticAnalyzers.cmake)
-
 # try to find vulkan
 #include(cmake/vulkan.cmake)
 

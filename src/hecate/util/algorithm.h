@@ -1,8 +1,31 @@
-//
-// Created by mail on 06-Jul-22.
-//
+#pragma once
 
-#ifndef HECATE_ALGORITHM_H
-#define HECATE_ALGORITHM_H
+namespace hecate::util {
+    template <typename C, typename V>
+    requires (std::convertible_to<V, typename C::value_type>)
+    auto find(
+        const C& container,
+        const V& value
+    );
 
-#endif //HECATE_ALGORITHM_H
+    template <typename C, typename P>
+    auto find_if(
+        const C& container,
+        P        predicate
+    );
+
+    template <typename C, typename V>
+    requires (std::convertible_to<V, typename C::value_type>)
+    bool contains(
+        const C& container,
+        const V& value
+    );
+
+    template <typename C, typename P>
+    bool contains_if(
+        const C& container,
+        P        predicate
+    );
+}
+
+#include "algorithm.inl"

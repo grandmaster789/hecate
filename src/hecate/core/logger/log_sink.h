@@ -66,10 +66,6 @@ namespace hecate::core::logger {
 	LogSink makeStdErrSink();   // [logLevel] [message] [\n] ~> std::cerr
 	
 	LogSink makeFileSink(const std::filesystem::path& p); // [timestamp] [loglevel] [message] ([sourcefile]:[linenumber]) [\n] ~> p
-	
-#if HECATE_PLATFORM == HECATE_PLATFORM_WINDOWS
-	LogSink makeDebuggerSink(); // [loglevel] [message] [\n] ~> OutputDebugStringA
-#endif
 }
 
 #include "log_sink.inl"

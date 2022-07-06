@@ -7,17 +7,13 @@ namespace hecate::core::logger {
 		Logger*            owner,
 		e_LogCategory      category,
 		const std::string& source_file,
-		unsigned int       source_line,
-		util::ThreadID     thread_id,
-		const std::string& thread_name
+		unsigned int       source_line
 	):
 		m_Owner(owner),
 		m_MetaInfo{
 			category,
 			source_file,
-			source_line,
-			thread_id,
-			thread_name
+			source_line
 		}
 	{
 	}

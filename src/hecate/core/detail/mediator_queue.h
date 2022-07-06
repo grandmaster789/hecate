@@ -3,7 +3,6 @@
 #include <vector>
 #include <mutex>
 #include <functional>
-#include "../../util/spin_mutex.h"
 
 namespace hecate::core::detail {
 	// A MessageHandler is either
@@ -29,7 +28,7 @@ namespace hecate::core::detail {
 		void broadcast(const t_Message& message);
 
 	private:
-		using Mutex     = util::SpinMutex;
+		using Mutex     = std::mutex;
 		using LockGuard = std::lock_guard<Mutex>;
 		using Handler   = std::function<void(const t_Message&)>;
 

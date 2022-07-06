@@ -2,8 +2,10 @@
 #include "logger.h"
 #include "logger/log_sink.h"
 #include "../util/algorithm.h"
-#include "../util/threads.h"
 #include "../dependencies.h"
+
+// default subsystems
+#include "../graphics/graphics.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -26,6 +28,7 @@ namespace {
 
 namespace hecate::core {
 	Engine::Engine() {
+		add<graphics::Graphics>();
 	}
 
 	Engine::~Engine() {
@@ -37,8 +40,6 @@ namespace hecate::core {
 	}
 
 	void Engine::start() {
-		util::set_current_thread_name("Hecate main thread");
-
 		m_Running = true;
 
 		// if the global logger only has 1 sink, it logs *only* to 'scimitar.log'
@@ -77,7 +78,7 @@ namespace hecate::core {
 			using namespace nlohmann;
 			using namespace std;
 
-			ifstream in("scimitar.json");
+			ifstream in("hecate.json");
 			if (in.good()) {
 				json settings;
 				in >> settings;
@@ -116,7 +117,7 @@ namespace hecate::core {
 
 			auto it = std::begin(m_Systems);
 
-			while (true) {
+			while (it != std::end(m_Systems)) {
 				      auto* current_system = it->get();
 				const auto& sytem_name     = current_system->get_name();
 

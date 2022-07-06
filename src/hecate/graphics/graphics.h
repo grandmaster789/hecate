@@ -19,7 +19,7 @@ namespace hecate::graphics {
 		void update() override;
 		void shutdown() override;
 
-		const vk::Instance& get_vk_instance(() const noexcept;
+		const vk::Instance& get_vk_instance() const noexcept;
 
 	private:
 		void init_vulkan();

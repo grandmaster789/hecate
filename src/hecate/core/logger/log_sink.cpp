@@ -1,11 +1,9 @@
 #include "log_sink.h"
-#include "../../util/debugger.h"
 
 #include <rang.hpp>
 
 #include <iostream>
 #include <fstream>
-#include <format>
 #include <chrono>
 #include <filesystem>
 
@@ -15,7 +13,7 @@ namespace {
 			m_File(p.string())
 		{
 			if (!m_File.good())
-				debugger_abort("Failed to create file sink");
+                throw std::runtime_error("Failed to create file sink");
 		}
 
 		void operator()(
@@ -27,20 +25,6 @@ namespace {
 			auto simplified_source_path = std::filesystem::path(info.m_SourceFile)
 				.filename()
 				.string();
-
-			// in the MSVC STL v14.29.30133 we can't provide formatter specializations... fixes are
-			// coming in Visual Studio 2022 but at the moment that's still a Preview IDE so I'm holding out
-			// for a bit...
-			// time formatting also seems broken, so I'll just use the old school C approach... which has platform issues...
-
-			/*m_File << std::format(
-				"[{%T}] {} {} ({}:{})\n",
-				now, // https://en.cppreference.com/w/cpp/chrono/system_clock/formatter#Format_specification
-				cat.str(),
-				message,
-				info.m_SourceFile,
-				info.m_SourceLine
-			);*/
 
 			auto tc = std::chrono::system_clock::to_time_t(now);
 			tm localtime;
@@ -104,16 +88,4 @@ namespace hecate::core::logger {
 	LogSink makeFileSink(const std::filesystem::path& p) {
 		return FileSink(p);
 	}
-
-#if HECATE_PLATFORM == HECATE_PLATFORM_WINDOWS
-	LogSink makeDebuggerSink() {
-		return[](
-			const LogMessage::MetaInfo& info,
-			const std::string&          message
-		) {
-			(void)info;
-			debugger_message(message);
-		};
-	}
-#endif
 }

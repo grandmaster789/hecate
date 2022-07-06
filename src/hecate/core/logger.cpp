@@ -1,7 +1,6 @@
 #include "logger.h"
 #include "logger/log_message.h"
 #include "logger/log_sink.h"
-#include "../util/threads.h"
 
 namespace hecate::core {
 	Logger::Logger(const std::string& filename) {
@@ -23,9 +22,7 @@ namespace hecate::core {
 			this, 
 			category, 
 			source_file, 
-			source_line,
-			util::get_current_threadID(),
-			util::get_current_thread_name()
+			source_line
 		);
 	}
 

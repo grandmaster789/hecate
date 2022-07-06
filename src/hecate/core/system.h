@@ -68,7 +68,7 @@ namespace hecate::core {
 		friend std::ostream& operator << (std::ostream& os, const System& s);
 
 	protected:
-		void add_dependency(std::string_view system_name);
+		void add_dependency(const std::string& system_name);
 
 		template <typename T>
 		void register_setting(

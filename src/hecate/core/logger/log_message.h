@@ -4,7 +4,6 @@
 #include <iosfwd>
 #include <sstream>
 #include <string>
-#include "../../util/threads.h"
 
 namespace hecate::core {
 	class Logger;
@@ -24,9 +23,7 @@ namespace hecate::core::logger {
 			Logger*            owner,
 			e_LogCategory      category,
 			const std::string& source_file,
-			unsigned int       source_line,
-			util::ThreadID     thread_id,
-			const std::string& thread_name
+			unsigned int       source_line
 		);
 
 		// no-copy, move-default (moving is questionable though)
@@ -49,8 +46,6 @@ namespace hecate::core::logger {
 			e_LogCategory  m_Category;
 			std::string    m_SourceFile;
 			unsigned int   m_SourceLine;
-			util::ThreadID m_ThreadID;
-			std::string    m_ThreadName;
 		};
 
 	private:

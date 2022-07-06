@@ -67,28 +67,15 @@
 	#include <intrin.h>
 	#include <debugapi.h>
 	#include <dwmapi.h>
-	#pragma comment(lib, "dwmapi")
 
 	#define VK_USE_PLATFORM_WIN32_KHR
-#endif
-
-// figure out what processor this is built for (really only tested on x64)
-#define HECATE_PROCESSOR_X64 1
-#define HECATE_PROCESSOR_ARM 2
-
-#if defined(__x86_64__) || defined(__amd64__) || defined(_M_AMD64)
-	#define HECATE_PROCESSOR HECATE_PROCESSOR_X64
-#elif defined(__arm__) || defined(_M_ARM)
-	#define HECATE_PROCESSOR HECATE_PROCESSOR_ARM
-#else
-	#error "Could not detect processor"
 #endif
 
 // Build types
 #define HECATE_BUILD_DEBUG   1
 #define HECATE_BUILD_RELEASE 2
 
-// with MSVC we can figure out wheter this is a debug build
+// with MSVC we can figure out whether this is a debug build
 #ifdef _DEBUG
 	#define HECATE_BUILD HECATE_BUILD_DEBUG
 #else
@@ -143,13 +130,6 @@ namespace hecate {
 		current = HECATE_PLATFORM
 	};
 
-	enum class e_Processor {
-		x64 = HECATE_PROCESSOR_X64,
-		arm = HECATE_PROCESSOR_ARM,
-
-		current = HECATE_PROCESSOR
-	};
-
 	enum class e_Compiler {
 		msvc  = HECATE_COMPILER_MSVC,
 		clang = HECATE_COMPILER_CLANG,
@@ -167,7 +147,6 @@ namespace hecate {
 
 	// make preprocessor constants available as constant expressions
 	static constexpr e_Platform  k_Platform  = e_Platform ::current;
-	static constexpr e_Processor k_Processor = e_Processor::current;
 	static constexpr e_Compiler  k_Compiler  = e_Compiler ::current;
 	static constexpr e_Build     k_Build     = e_Build    ::current;
 }
