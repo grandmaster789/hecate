@@ -53,4 +53,20 @@ namespace hecate::util {
                 predicate
         ) != std::end(container);
     }
+
+    template <typename C, typename P, typename Fn>
+    void consume_if(
+        C&&  range,
+        P&&  predicate,
+        Fn&& callback
+    ) {
+        for (auto it = std::begin(range); it != std::end(range);) {
+            if (predicate(*it)) {
+                callback(*it);
+                it = range.erase(it);
+            }
+            else
+                ++it;
+        }
+    }
 }

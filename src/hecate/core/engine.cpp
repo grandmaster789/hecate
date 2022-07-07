@@ -42,7 +42,7 @@ namespace hecate::core {
 	void Engine::start() {
 		m_Running = true;
 
-		// if the global logger only has 1 sink, it logs *only* to 'scimitar.log'
+		// if the global logger only has 1 sink, it logs *only* to 'hecate.log'
 		if (Logger::instance().getNumSinks() < 2)
 			Logger::instance().add(logger::makeStdOutSink());
 
@@ -255,9 +255,9 @@ namespace hecate::core {
 				settings[system->get_name()] = js;
 			}
 
-			std::ofstream out("scimitar.json");
+			std::ofstream out("hecate.json");
 			if (!out.good())
-				g_Log << "Failed to write to scimitar.json";
+				g_Log << "Failed to write to hecate.json";
 			else
 				out << settings.dump(2);
 		}

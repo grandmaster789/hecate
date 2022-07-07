@@ -33,4 +33,4 @@ namespace hecate {
     MessageHandler<T>::~MessageHandler() {
         detach_handler<T>(this);
     }
-}  // namespace scimitar
+}  // namespace hecate

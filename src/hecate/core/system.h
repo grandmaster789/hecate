@@ -20,7 +20,7 @@ namespace hecate::core {
 	*	Current Subsystem features:
 	*		Engine-managed initialization/shutdown including inter-system dependency management
 	*		Engine-managed updating of running subsystems
-	*		Per-subsystem settings via combined 'scimitar.json'
+	*		Per-subsystem settings via combined 'hecate.json'
 	*		
 	*	Considerations:
 	*		Per-system logs? currently everything uses a global log though
