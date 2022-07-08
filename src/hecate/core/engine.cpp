@@ -5,6 +5,7 @@
 #include "../dependencies.h"
 
 // default subsystems
+#include "../platform/platform.h"
 #include "../graphics/graphics.h"
 
 #include <stdexcept>
@@ -28,6 +29,7 @@ namespace {
 
 namespace hecate::core {
 	Engine::Engine() {
+		add<platform::Platform>();
 		add<graphics::Graphics>();
 	}
 
@@ -129,7 +131,8 @@ namespace hecate::core {
 				) {
 					current_system->m_Engine = this;
 
-					current_system->init();
+					if (!current_system->init())
+						throw std::runtime_error("Failed to start subsystem");
 					
 					m_InitOrder.push_back(sytem_name);
 

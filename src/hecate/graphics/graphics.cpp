@@ -4,17 +4,21 @@ namespace hecate::graphics {
 	Graphics::Graphics():
 		System("Graphics")
 	{
+		add_dependency("Platform"); // needs Platform for WSI
 	}
 
-	void Graphics::init() {
+	bool Graphics::init() {
+		System::init();
 
+		return true;
 	}
+
 	void Graphics::update() {
 		
 	}
 
 	void Graphics::shutdown() {
-
+		System::shutdown();
 	}
 
 	const vk::Instance& Graphics::get_vk_instance() const noexcept {

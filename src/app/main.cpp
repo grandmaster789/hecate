@@ -11,8 +11,9 @@ public:
 	{
 	}
 
-	void init() override {
+	bool init() override {
 		g_Log << "Initializing application";
+		return true;
 	}
 
 	void update() override {

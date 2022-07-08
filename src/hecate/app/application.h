@@ -9,7 +9,7 @@ namespace hecate::app {
 	public:
 		explicit Application(const std::string& name);
 
-		virtual void init()     = 0;
+		virtual bool init()     = 0;
 		virtual void update()   = 0;
 		virtual void shutdown() = 0;
 	};

@@ -54,7 +54,7 @@ namespace hecate::core {
 		System             (System&&) noexcept = default;
 		System& operator = (System&&) noexcept = default;
 
-		virtual void init();
+		virtual bool init();     // returns false on failure
 		virtual void update();
 		virtual void shutdown(); // prepare for cleanup - finalize settings to be serialized etc
 

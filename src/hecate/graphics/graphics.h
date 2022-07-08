@@ -15,8 +15,8 @@ namespace hecate::graphics {
 	public:
 		Graphics();
 
-		void init() override;
-		void update() override;
+		bool init()     override;
+		void update()   override;
 		void shutdown() override;
 
 		const vk::Instance& get_vk_instance() const noexcept;

@@ -9,8 +9,10 @@ namespace hecate::core {
 	{
 	}
 	
-	void System::init() {
+	bool System::init() {
 		g_Log << "Starting subsystem " << get_name();
+
+		return true;
 	}
 
 	void System::update() {

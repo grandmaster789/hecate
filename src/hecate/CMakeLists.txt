@@ -18,6 +18,8 @@ add_library(
     "core/system.cpp"
     "graphics/graphics.h"
     "graphics/graphics.cpp"
+    "platform/platform.h" 
+    $<${WIN32}:${CMAKE_CURRENT_SOURCE_DIR}/platform/platform_win32.cpp>
 )
 
 find_package(fmt CONFIG REQUIRED)
