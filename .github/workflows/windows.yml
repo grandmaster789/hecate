@@ -1,7 +1,6 @@
 name: Windows CI
 
-on:
-  [push, pull_request]
+on: [push, pull_request]
 
 env:
   hecate_build_type: "Release"
