@@ -15,10 +15,12 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        - {
-          name: "Windows MSVC",
-          artifact: "windows-msvc.zip",
-        }
+          - {
+            name: "Windows MSVC",
+            artifact: "windows-msvc.zip",
+            cc: "cl", 
+            cxx: "cl"
+          }
 
     steps:
     - name: Setup python, conan, ninja
