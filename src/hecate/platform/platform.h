@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../core/system.h"
+#include "../dependencies.h"
 #include <cstdint>
 
 namespace hecate::platform {
@@ -18,24 +19,22 @@ namespace hecate::platform {
 		void update()   override;
 		void shutdown() override;
 
-		// WSI
-		static bool message_pump();
-
-		// Memory
-		static void* allocate   (uint64_t num_bytes, bool aligned_storage);
-		static void  deallocate (void* block, bool aligned_storage);
-		static void* zero_memory(void* block, uint64_t num_bytes);
-		static void* copy_memory(void* dest, const void* source, uint64_t num_bytes);
-		static void* set_memory (void* dest, int32_t value, uint64_t num_bytes);
-
 		// Filesystem
 
 		// Clock
 		static double get_absolute_time(); // time in seconds since starting the program
 		static void   sleep_ms(uint64_t milliseconds);
 
-		// Console 
-		static void console_write(const char* message,       uint8_t color = 1);
-		static void console_write_error(const char* message, uint8_t color = 1);
+	private:
+		// persistent variables
+		int  m_MainWindowWidth  = 800;
+		int  m_MainWindowHeight = 600;
+		bool m_Fullscreen       = false;
+		int  m_DisplayDeviceIdx = 0;
 	};
+}
+
+namespace hecate {
+	std::wstring to_wstring(const std::string& string);
+	std::string  to_string(const std::wstring& wide_string);
 }

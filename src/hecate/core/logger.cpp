@@ -8,7 +8,7 @@ namespace hecate::core {
 	}
 
 	// this class provides a singleton interface, but can also be used as a regular object
-	Logger& Logger::instance() {
+	Logger& Logger::instance() noexcept {
 		static Logger global_logger("hecate.log");
 		return global_logger;
 	}
@@ -17,7 +17,7 @@ namespace hecate::core {
 		e_LogCategory      category,
 		const std::string& source_file,
 		unsigned int       source_line
-	) {
+	) noexcept {
 		return LogMessage(
 			this, 
 			category, 
@@ -26,19 +26,19 @@ namespace hecate::core {
 		);
 	}
 
-	void Logger::add(LogSink sink) {
+	void Logger::add(LogSink sink) noexcept {
 		m_Sinks.push_back(std::move(sink));
 	}
 
-	void Logger::removeAll() {
+	void Logger::removeAll() noexcept {
 		m_Sinks.clear();
 	}
 
-	size_t Logger::getNumSinks() const {
+	size_t Logger::getNumSinks() const noexcept {
 		return m_Sinks.size();
 	}
 
-	void Logger::flush(logger::LogMessage* message) {
+	void Logger::flush(logger::LogMessage* message) noexcept {
 		auto info = message->m_MetaInfo;
 		auto str  = message->m_Buffer.str();
 

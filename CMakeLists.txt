@@ -41,9 +41,9 @@ option(ENABLE_TESTING "Enable Test Builds" ON)
 # the actual application
 
 add_subdirectory("src/app")
-add_subdirectory("src/hecate")
+add_subdirectory("src/${This}")
 
 if (ENABLE_TESTING)
 	enable_testing()
-	add_subdirectory("test/${PROJECT_NAME}")
+	add_subdirectory("test")
 endif()

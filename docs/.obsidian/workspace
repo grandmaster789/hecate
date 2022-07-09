@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Geometric Algebra.md",
+            "file": "Windows High DPI notes.md",
             "mode": "source",
             "source": false
           }
@@ -69,7 +69,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Geometric Algebra.md",
+                "file": "Windows High DPI notes.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -89,6 +89,7 @@
   },
   "active": "e01d9b8fd3deb4e5",
   "lastOpenFiles": [
+    "Windows High DPI notes.md",
     "Geometric Algebra.md",
     "Notes.md",
     "Project setup.md",

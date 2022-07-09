@@ -1,11 +1,11 @@
 #include "log_sink.h"
-
-#include <rang.hpp>
+#include "../../platform/platform.h"
 
 #include <iostream>
 #include <fstream>
 #include <chrono>
 #include <filesystem>
+#include <format>
 
 namespace {
 	struct FileSink {
@@ -19,28 +19,19 @@ namespace {
 		void operator()(
 			const hecate::core::logger::LogMessage::MetaInfo& info, 
 			const std::string&                                  message
-		) {
+		) noexcept {
 			auto now = std::chrono::system_clock::now();
 
 			auto simplified_source_path = std::filesystem::path(info.m_SourceFile)
 				.filename()
 				.string();
 
-			auto tc = std::chrono::system_clock::to_time_t(now);
-			tm localtime;
-
-#if HECATE_PLATFORM == HECATE_PLATFORM_WINDOWS
-				localtime_s(&localtime, &tc);
-#else
-				localtime_r(&localtime, &tc);
-#endif
-
-			m_File 
-				<< std::put_time(&localtime, "[%H:%M:%S] ")
+			m_File
+				<< std::vformat("{0:%T}", std::make_format_args(now))
 				<< info.m_Category
 				<< message
 				<< " (" << simplified_source_path
-				<< ":"  << info.m_SourceLine
+				<< ":" << info.m_SourceLine
 				<< ")\n";
 		}
 

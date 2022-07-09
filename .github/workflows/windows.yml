@@ -23,11 +23,11 @@ jobs:
           }
 
     steps:
-    - name: Setup python, conan, ninja
+    - name: Setup python, ninja
       shell: pwsh
       run: |
         pip3 install wheel setuptools
-        pip3 install conan
+        #pip3 install conan
         choco install ninja
 
     - name: Install Vulkan SDK
@@ -49,9 +49,9 @@ jobs:
         $env:Path += ";${{ env.hecate_vulkan_sdk }}\;${{ env.hecate_vulkan_sdk }}\Bin\"
 
         # conan configuration
-        conan profile new default --detect --force
-        conan profile update settings.compiler="Visual Studio" default
-        conan profile update settings.compiler.version=17 default
+        #conan profile new default --detect --force
+        #conan profile update settings.compiler="Visual Studio" default
+        #conan profile update settings.compiler.version=17 default
 
         # cmake project
         cmake . `

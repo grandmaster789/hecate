@@ -47,3 +47,6 @@
 #if HECATE_COMPILER == HECATE_COMPILER_MSVC
 	#pragma warning(pop)
 #endif
+
+// https://agauniyal.github.io/rang/
+#include <rang.hpp>

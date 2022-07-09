@@ -20,20 +20,20 @@ namespace hecate::core {
 		Logger(const std::string& filename); // log both to a file and to std::cout
 
 		// this class provides a singleton interface, but can also be used as a regular object
-		static Logger& instance();
+		static Logger& instance() noexcept;
 
-		void   add(LogSink sink);
-		void   removeAll();
-		size_t getNumSinks() const;
+		void   add(LogSink sink) noexcept;
+		void   removeAll() noexcept;
+		size_t getNumSinks() const noexcept;
 
-		void flush(LogMessage* message);
+		void flush(LogMessage* message) noexcept;
 
 		// create an associated LogMessage with the appropriate message metadata
 		LogMessage operator()(
 			e_LogCategory      category,
 			const std::string& source_file,
 			unsigned int       source_line
-		);
+		) noexcept;
 
 	private:
 		std::vector<LogSink> m_Sinks;

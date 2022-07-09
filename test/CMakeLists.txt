@@ -9,7 +9,7 @@ add_executable(
         unittest.cpp
 )
 
-include_directories(../../src/hecate)
+include_directories(../src/hecate)
 
 target_link_libraries(
         unittest PRIVATE

@@ -1,15 +1,19 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.16)
 
 add_executable(
-        Entry
-        main.cpp
+    hecate
+    main.cpp
 )
 
 include_directories(../hecate)
 
 target_link_libraries(
-        Entry PRIVATE
-        HecateLib
+    hecate PRIVATE
+    HecateLib
 )
+
+if (WIN32)
+    set_property(TARGET hecate PROPERTY VS_DPI_AWARE "PerMonitor")
+endif()
 
 # [TODO] STILL MISSING: Install Target
