@@ -2,9 +2,9 @@
 #include "logger/log_message.h"
 #include "logger/log_sink.h"
 
-namespace hecate::core {
+namespace hecate {
 	Logger::Logger(const std::string& filename) {
-		add(logger::makeFileSink(filename));
+		add(core::logger::makeFileSink(filename));
 	}
 
 	// this class provides a singleton interface, but can also be used as a regular object
@@ -38,7 +38,7 @@ namespace hecate::core {
 		return m_Sinks.size();
 	}
 
-	void Logger::flush(logger::LogMessage* message) noexcept {
+	void Logger::flush(core::logger::LogMessage* message) noexcept {
 		auto info = message->m_MetaInfo;
 		auto str  = message->m_Buffer.str();
 

@@ -29,7 +29,7 @@ namespace {
 		if (!userdata)
 			return DefWindowProc(window_handle, message, wparam, lparam);
 
-		auto* platform_object = (hecate::platform::Platform*)userdata;
+		auto* platform_object = (hecate::Platform*)userdata;
 
 		// TODO ~~ forward key/mouse events to Input subsystem
 		// notifications: https://docs.microsoft.com/en-us/windows/win32/winmsg/window-notifications
@@ -41,7 +41,7 @@ namespace {
 			return 0;
 
 		case WM_CLOSE:
-			hecate::core::Engine::instance().stop();
+			hecate::Engine::instance().stop();
 			return 0;
 		}
 
@@ -120,7 +120,7 @@ namespace {
 	}
 }
 
-namespace hecate::platform {
+namespace hecate {
 	Platform::Platform():
 		System("Platform")
 	{

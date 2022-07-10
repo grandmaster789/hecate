@@ -1,9 +1,10 @@
 #include <iostream>
 
-#include "hecate.h"
+#include "app/application.h"
+#include "core/engine.h"
 
 class HecateApplication :
-	public hecate::app::Application
+	public hecate::Application
 {
 public:
 	HecateApplication():
@@ -25,7 +26,7 @@ public:
 };
 
 int main() {
-	auto& engine = hecate::core::Engine::instance();
+	auto& engine = hecate::Engine::instance();
 
 	engine.set_application<HecateApplication>();
 	engine.start();

@@ -27,6 +27,6 @@ namespace hecate {
 
         virtual void operator()(const T& message) = 0;
     };
-}  // namespace djinn
+}  // namespace hecate
 
 #include "mediator.inl"

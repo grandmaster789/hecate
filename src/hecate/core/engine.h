@@ -13,10 +13,10 @@
 /*
 *	The Engine coordinates subsystem configuration and task execution
 */
-namespace hecate::core {
+namespace hecate {
 	class Engine {
 	private:
-		using ApplicationPtr = std::unique_ptr<app::Application>;
+		using ApplicationPtr = std::unique_ptr<Application>;
 		using SystemPtr      = std::unique_ptr<System>;
 
 		Engine();
@@ -46,7 +46,7 @@ namespace hecate::core {
 		template <c_System T>
 		T* get();
 
-		template <app::c_Application T, typename... tArgs>
+		template <c_Application T, typename... tArgs>
 		void set_application(tArgs... args);
 
 	private:

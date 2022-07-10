@@ -1,8 +1,8 @@
 #include "application.h"
 
-namespace hecate::app {
+namespace hecate {
 	Application::Application(const std::string& name):
-		core::System(name)
+		System(name)
 	{
 	}
 }

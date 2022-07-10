@@ -16,7 +16,7 @@ namespace {
 	static constexpr const char* k_SettingsFilename = "hecate.json";
 
 	bool is_satisfied(
-		hecate::core::System*           s,
+		hecate::System*           s,
 		const std::vector<std::string>& already_initialized
 	) {
 		using hecate::util::contains;
@@ -29,10 +29,10 @@ namespace {
 	}
 }
 
-namespace hecate::core {
+namespace hecate {
 	Engine::Engine() {
-		add<platform::Platform>();
-		add<graphics::Graphics>();
+		add<Platform>();
+		add<Graphics>();
 	}
 
 	Engine::~Engine() {
@@ -48,7 +48,7 @@ namespace hecate::core {
 
 		// if the global logger only has 1 sink, it logs *only* to 'hecate.log'
 		if (Logger::instance().getNumSinks() < 2)
-			Logger::instance().add(logger::makeStdOutSink());
+			Logger::instance().add(core::logger::makeStdOutSink());
 
 		start_libraries();
 		start_systems();

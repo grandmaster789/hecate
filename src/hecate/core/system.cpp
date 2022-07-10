@@ -3,7 +3,7 @@
 #include "../util/algorithm.h"
 #include "logger.h"
 
-namespace hecate::core {
+namespace hecate {
 	System::System(const std::string& unique_system_name):
 		m_Name(unique_system_name)
 	{

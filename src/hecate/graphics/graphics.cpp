@@ -1,6 +1,6 @@
 #include "graphics.h"
 
-namespace hecate::graphics {
+namespace hecate {
 	Graphics::Graphics():
 		System("Graphics")
 	{

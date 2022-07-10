@@ -2,7 +2,7 @@
 
 #include "system.h"
 
-namespace hecate::core {
+namespace hecate {
 	template <typename T>
 	void System::register_setting(
 		const std::string& json_key,

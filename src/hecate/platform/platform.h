@@ -4,13 +4,13 @@
 #include "../dependencies.h"
 #include <cstdint>
 
-namespace hecate::platform {
+namespace hecate {
 	//
 	// This is responsible for platform-specific stuff, WSI etc
 	// The idea is to have this be the interface, while using CMake to differentiate which cpp to implement it
 	// 
-	class Platform :
-		public core::System
+	class Platform:
+		public System
 	{
 	public:
 		Platform();
@@ -31,9 +31,7 @@ namespace hecate::platform {
 		int m_MainWindowHeight = -1; // use -1 for OS default
 		int m_DisplayDeviceIdx = 0;
 	};
-}
 
-namespace hecate {
 	// NOTE the standard library implementation got deprecated in c++17 without a replacement (!), 
 	//      so we'll have to depend on OS-level facilities instead...
 	std::wstring to_wstring(const std::string& string);

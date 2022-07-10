@@ -1,13 +1,14 @@
 #pragma once
 
-// NOTE this should only be included *outside* of the HecateLib project
+namespace hecate {
+	class Application;
+	class Engine;
 
-#include "app/application.h"
+	namespace core {	
+		class Logger;
+		class System;
+	}
 
-#include "core/engine.h"
-#include "core/logger.h"
-#include "core/mediator.h"
-#include "core/system.h"
-
-#include "util/algorithm.h"
-#include "util/typemap.h"
+	class Graphics;
+	class Platform;
+}

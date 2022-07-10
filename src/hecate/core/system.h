@@ -11,11 +11,9 @@
 
 #include "mediator.h"
 
-namespace hecate::app {
+namespace hecate {
 	class Application;
-}
 
-namespace hecate::core {
 	/*
 	*	Current Subsystem features:
 	*		Engine-managed initialization/shutdown including inter-system dependency management
@@ -87,7 +85,7 @@ namespace hecate::core {
 	template <typename T>
 	concept c_System = 
 		 std::derived_from<T, System> &&
-		!std::derived_from<T, app::Application>;
+		!std::derived_from<T, Application>;
 }
 
 #include "system.inl"

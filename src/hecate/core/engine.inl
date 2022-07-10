@@ -3,7 +3,7 @@
 #include "engine.h"
 #include <utility>
 
-namespace hecate::core {
+namespace hecate {
 	template <c_System T, typename... tArgs>
 	T* Engine::add(tArgs... args) {
 		std::unique_ptr<T> system;
@@ -47,7 +47,7 @@ namespace hecate::core {
 		return m_SystemMap.get<T>();
 	}
 
-	template <app::c_Application T, typename... tArgs>
+	template <c_Application T, typename... tArgs>
 	void Engine::set_application(tArgs... args) {
 		if constexpr (sizeof...(tArgs) > 0)
 			m_Application = std::make_unique<T>(std::forward<tArgs...>(args...));

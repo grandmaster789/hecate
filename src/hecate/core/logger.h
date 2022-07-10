@@ -9,12 +9,12 @@ namespace hecate::core::logger {
 	class LogMessage;
 }
 
-namespace hecate::core {
+namespace hecate {
 	class Logger {
 	public:
-		using LogSink       = logger::LogSink;
-		using LogMessage    = logger::LogMessage;
-		using e_LogCategory = logger::e_LogCategory;
+		using LogSink       = core::logger::LogSink;
+		using LogMessage    = core::logger::LogMessage;
+		using e_LogCategory = core::logger::e_LogCategory;
 
 		explicit Logger() = default;
 		Logger(const std::string& filename); // log both to a file and to std::cout
@@ -42,7 +42,7 @@ namespace hecate::core {
 
 // macros to make it as painless as possible to log something
 #define g_LogCategory(category) \
-	(::hecate::core::Logger::instance()(::hecate::core::logger::e_LogCategory::category, __FILE__, __LINE__))
+	(::hecate::Logger::instance()(::hecate::core::logger::e_LogCategory::category, __FILE__, __LINE__))
 
 #define g_Log (g_LogCategory(info))
 

@@ -5,12 +5,12 @@
 #include "../dependencies.h"
 #include "../core/system.h"
 
-namespace hecate::graphics {
+namespace hecate {
 	// Subsystem responsible for handling graphics resources
 	// (this is the Vulkan interface)
 	//
 	class Graphics :
-		public core::System
+		public System
 	{
 	public:
 		Graphics();

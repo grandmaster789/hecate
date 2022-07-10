@@ -2,9 +2,9 @@
 
 #include "../core/system.h"
 
-namespace hecate::app {
+namespace hecate {
 	class Application:
-		public core::System
+		public System
 	{
 	public:
 		explicit Application(const std::string& name);
