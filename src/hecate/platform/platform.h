@@ -27,14 +27,15 @@ namespace hecate::platform {
 
 	private:
 		// persistent variables
-		int  m_MainWindowWidth  = 800;
-		int  m_MainWindowHeight = 600;
-		bool m_Fullscreen       = false;
-		int  m_DisplayDeviceIdx = 0;
+		int m_MainWindowWidth  = -1; // use -1 for OS default
+		int m_MainWindowHeight = -1; // use -1 for OS default
+		int m_DisplayDeviceIdx = 0;
 	};
 }
 
 namespace hecate {
+	// NOTE the standard library implementation got deprecated in c++17 without a replacement (!), 
+	//      so we'll have to depend on OS-level facilities instead...
 	std::wstring to_wstring(const std::string& string);
 	std::string  to_string(const std::wstring& wide_string);
 }

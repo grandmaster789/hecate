@@ -1,13 +1,13 @@
-Initial project setup via cmake-init
-- install python3
-- (elevated) run pip-install cmake-init
-- cmake-init -std 20 --no-clang-tidy --p vcpkg hecate
-- fetch vcpkg.cmake from [[https://github.com/bitmeal/vcpkg-cmake-integration]], put it in /cmake
-- in root CMakeLists.txt, add before 'project':
-	- set(VCPKG_VERSION latest)
-	- include(cmake/vcpkg.cmake)
-- NOTE the generated vcpkg.json uses pinned versions, not latest stable
-- Copy the CMakeUserPresets.json from HACKING.md
-	- Slight edit - set OS to  `win64`
-	- Removed spell checking (by default it will also check javascript and try to correct variable names and such)
-	- Removed format checks (I prefer my own formatting)
+Project setup is sort of platform-specific, so here I'll document the environment
+
+### Windows
+- https://www.python.org/
+- https://www.7-zip.org/download.html
+- https://chocolatey.org/
+	- choco install ninja
+- https://www.lunarg.com/vulkan-sdk/
+- https://cmake.org/
+	- cmake . -Bbuild -DCMAKE_BUILD_TYPE=Debug -G "Visual Studio 17 2022" -A x64
+	- cmake --build build --config Debug
+
+This should mirror the steps in the Github Workflows yml, at .github/workflows/windows.yml

@@ -13,6 +13,8 @@
 #include <fstream>
 
 namespace {
+	static constexpr const char* k_SettingsFilename = "hecate.json";
+
 	bool is_satisfied(
 		hecate::core::System*           s,
 		const std::vector<std::string>& already_initialized
@@ -80,7 +82,7 @@ namespace hecate::core {
 			using namespace nlohmann;
 			using namespace std;
 
-			ifstream in("hecate.json");
+			ifstream in(k_SettingsFilename);
 			if (in.good()) {
 				json settings;
 				in >> settings;
@@ -258,11 +260,13 @@ namespace hecate::core {
 				settings[system->get_name()] = js;
 			}
 
-			std::ofstream out("hecate.json");
+			std::ofstream out(k_SettingsFilename);
 			if (!out.good())
-				g_Log << "Failed to write to hecate.json";
-			else
+				g_Log << "Failed to write to " << k_SettingsFilename;
+			else {
 				out << settings.dump(2);
+				g_Log << "Saved settings";
+			}
 		}
 	}
 }

@@ -24,47 +24,86 @@ namespace {
 		WPARAM   wparam,
 		LPARAM   lparam
 	) {
+		auto userdata = GetWindowLongPtr(window_handle, GWLP_USERDATA);
+
+		if (!userdata)
+			return DefWindowProc(window_handle, message, wparam, lparam);
+
+		auto* platform_object = (hecate::platform::Platform*)userdata;
+
 		// TODO ~~ forward key/mouse events to Input subsystem
 		// notifications: https://docs.microsoft.com/en-us/windows/win32/winmsg/window-notifications
 		// messages:      https://docs.microsoft.com/en-us/windows/win32/winmsg/window-messages
 		switch (message) {
-			
+
 		case WM_DESTROY:
-			PostQuitMessage(0);
+			PostQuitMessage(0); // well, this is fine if we're only using a single window
 			return 0;
 
 		case WM_CLOSE:
 			hecate::core::Engine::instance().stop();
 			return 0;
-
 		}
 
-		return DefWindowProc( // https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-defwindowproca
-			window_handle, 
-			message, 
-			wparam, 
+		return DefWindowProc(
+			window_handle,
+			message,
+			wparam,
 			lparam
 		);
 	}
-
+	
 	std::vector<DISPLAY_DEVICE> enumerate_display_devices() {
-		std::vector<DISPLAY_DEVICE> result;
+		std::vector<DISPLAY_DEVICE> result; 
+
+		/*
+		https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-enumdisplaydevicesa
+
+		To query all display devices in the current session, call this function (EnumDisplayDevices) in a loop, 
+		starting with iDevNum set to 0, and incrementing iDevNum until the function fails. 
+		To select all display devices in the desktop, use only the display devices that have 
+		the DISPLAY_DEVICE_ATTACHED_TO_DESKTOP flag in the DISPLAY_DEVICE structure
+		*/
 
 		for (int i = 0;; ++i) {
-			DISPLAY_DEVICE dd = {};
+			DISPLAY_DEVICE dd = {}; // https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-display_devicea
 			dd.cb = sizeof(DISPLAY_DEVICE);
-
-			// https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-enumdisplaydevicesa
+			
 			if (!EnumDisplayDevices(NULL, i, &dd, 0))
 				break; // stop if we coundn't find any more devices
 
 			if (dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)
 				continue; // skip over mirroring (pseudo) devices
 
+			// NOTE the DISPLAY_DEVICE documentation doesn't mention this, but the value of DISPLAY_DEVICE_ATTACHED_TO_DESKTOP is equal to DISPLAY_DEVICE_ACTIVE
+			if (!(dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)) 
+				continue; // skip non-attached displays
+
 			result.push_back(dd);
 		}
 
 		return result;
+	}
+
+	void list_display_devices() {
+		auto display_devices = enumerate_display_devices();
+
+		std::stringstream sstr;
+		sstr << "Listing currently active display devices:\n";
+		for (size_t i = 0; i < display_devices.size(); ++i) {
+			const auto& x = display_devices[i];
+
+			sstr << std::vformat(
+				"\t[#{}]: {} {}\n",
+				std::make_format_args(
+					i,
+					hecate::to_string(x.DeviceString),
+					hecate::to_string(x.DeviceID)
+				)
+			);
+		}
+
+		g_LogDebug << sstr.str();
 	}
 
 	DEVMODE get_current_displaymode(DISPLAY_DEVICE dd) {
@@ -73,6 +112,7 @@ namespace {
 		mode.dmSize = sizeof(mode);
 		mode.dmDriverExtra = 0;
 
+		// https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaysettingsw
 		if (!EnumDisplaySettings(dd.DeviceName, ENUM_CURRENT_SETTINGS, &mode))
 			throw std::runtime_error("Failed to query current display mode");
 
@@ -86,13 +126,15 @@ namespace hecate::platform {
 	{
 		register_setting("main_window_width",  &m_MainWindowWidth);
 		register_setting("main_window_height", &m_MainWindowHeight);
-		register_setting("fullscreen",         &m_Fullscreen);
 		register_setting("display_device",     &m_DisplayDeviceIdx);
 	}
 
 	bool Platform::init() {
 		System::init();
 		
+		// not sure if the VS_DPI_AWARE property does anything, so I'm also doing it in code
+		SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2); // https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setthreaddpiawarenesscontext
+
 		g_InstanceHandle = GetModuleHandle(nullptr);
 
 		// we'll just consider a single window
@@ -121,54 +163,31 @@ namespace hecate::platform {
 			throw std::runtime_error("No display devices are available");
 
 		if (display_monitors.size() < m_DisplayDeviceIdx) {
-			g_LogWarning << "Display device " << m_DisplayDeviceIdx << " is unavailable, falling back to device #0";
-			
-			std::stringstream sstr;
-			sstr << "Listing current display devices:\n";
-			for (size_t i = 0; i < display_monitors.size(); ++i)
-				sstr << std::vformat(
-					"\t[#{}]: {}\n", 
-					std::make_format_args(
-						i, 
-						to_string(display_monitors[i].DeviceString)
-					)
-				);
-
-			g_LogDebug << sstr.str();
-
+			g_LogWarning << "Display device " << m_DisplayDeviceIdx << " is unavailable, falling back to device #0";			
 			m_DisplayDeviceIdx = 0;
+			
+			list_display_devices(); // might as well show the current set of valid options
 		}
 
 		uint32_t window_style =    // https://docs.microsoft.com/en-us/windows/win32/winmsg/window-styles
-			WS_OVERLAPPED |        // The window is an overlapped window. An overlapped window has a title bar and a border
+			WS_CLIPSIBLINGS |      // Clips child windows relative to each other
+			WS_CLIPCHILDREN |      // Excludes the area occupied by child windows when drawing occurs within the parent window
 			WS_SYSMENU |           // The window has a window menu on its title bar
-			WS_CAPTION;            // The window has a title bar (includes the WS_BORDER style)
+			WS_MINIMIZEBOX;        // The window has a minimize button
 
 		uint32_t window_style_ex = // https://docs.microsoft.com/en-us/windows/win32/winmsg/extended-window-styles
 			WS_EX_APPWINDOW;       // Forces a top-level window onto the taskbar when the window is visible
 
-		RECT border = {};
-		AdjustWindowRectEx(
-			&border,
-			window_style,
-			FALSE,                 // menu
-			window_style_ex
-		);
-
-		int32_t window_x      = border.left;
-		int32_t window_y      = border.top;
-		int32_t window_width  = border.right  - border.left;
-		int32_t window_height = border.bottom - border.top;
-
+		// https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexa
 		g_WindowHandle = CreateWindowEx(
 			window_style_ex,
 			k_HecateWindowClassName,
 			k_HecateApplicationName,
 			window_style,
-			window_x,
-			window_y,
-			window_width,
-			window_height,
+			CW_USEDEFAULT,    // x (left)
+			CW_USEDEFAULT,    // y (top)
+			CW_USEDEFAULT,    // width 
+			CW_USEDEFAULT,    // height
 			nullptr,          // parent window handle
 			nullptr,          // menu handle
 			g_InstanceHandle, // program instance
@@ -180,7 +199,9 @@ namespace hecate::platform {
 			return false;
 		}
 
-		ShowWindow(g_WindowHandle, SW_SHOWMAXIMIZED); // https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow
+		// put a pointer to this Platform object in the Window userdata
+		SetWindowLongPtr(g_WindowHandle, GWLP_USERDATA, (LONG_PTR)this);
+		ShowWindow(g_WindowHandle, SW_SHOW); // https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow
 
 		// setup timing
 		{
@@ -218,25 +239,34 @@ namespace hecate::platform {
 	}
 
 	double Platform::get_absolute_time() {
-		return {};
+		if (!g_ClockFrequency) {
+			g_LogWarning << "Clock frequency is unknown";
+			return 0.0;
+		}
+
+		LARGE_INTEGER now;
+		QueryPerformanceCounter(&now);
+		return static_cast<double>(now.QuadPart) * g_ClockFrequency;
 	}
 
 	void Platform::sleep_ms(uint64_t milliseconds) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+		//std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+
+		Sleep(static_cast<DWORD>(milliseconds));
 	}
 }
 
 namespace hecate {
-	std::wstring to_wstring(const std::string& string) {
-		if (string.empty()) 
+	std::wstring to_wstring(const std::string& text) {
+		if (text.empty())
 			return L"";
 
 		// https://docs.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar
 		const auto size_needed = MultiByteToWideChar(
 			CP_UTF8, 
 			0, 
-			&string.at(0), 
-			(int)string.size(), 
+			&text.at(0),
+			static_cast<int>(text.size()),
 			nullptr, 
 			0
 		);
@@ -248,8 +278,8 @@ namespace hecate {
 		MultiByteToWideChar(
 			CP_UTF8, 
 			0, 
-			&string.at(0),
-			(int)string.size(), 
+			&text.at(0),
+			static_cast<int>(text.size()),
 			&result.at(0), 
 			size_needed
 		);
