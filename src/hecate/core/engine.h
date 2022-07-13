@@ -53,6 +53,9 @@ namespace hecate {
 		void start_libraries();
 		void stop_libraries();
 
+		void save_settings();
+		void load_settings();
+
 		void start_systems(); // loads settings, figures out in which order to resolve dependencies
 		void stop_systems();  // saves settings, cleans up subsystems in reverse init order
 

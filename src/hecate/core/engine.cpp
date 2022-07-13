@@ -6,6 +6,7 @@
 
 // default subsystems
 #include "../platform/platform.h"
+#include "../input/input.h"
 #include "../graphics/graphics.h"
 
 #include <stdexcept>
@@ -32,6 +33,7 @@ namespace {
 namespace hecate {
 	Engine::Engine() {
 		add<Platform>();
+		add<Input>();
 		add<Graphics>();
 	}
 
@@ -76,42 +78,99 @@ namespace hecate {
 	void Engine::stop_libraries() {
 	}
 
+	void Engine::save_settings() {
+		using namespace nlohmann;
+
+		json settings;
+
+		// traverse and consolidate settings from all systems and the current application
+
+		if (m_Application) {
+			json js;
+
+			for (const auto& entry : m_Application->get_settings()) {
+				auto fetch = entry.m_GetFn();
+
+				if (fetch.size() != 1)
+					throw std::runtime_error("Currently only singular variables are supported");
+
+				js.emplace(
+					fetch.begin().key(),
+					*fetch.begin()
+				);
+			}
+
+			settings[m_Application->get_name()] = js;
+		}
+
+		// now the rest of the subsystems
+		for (const auto& system : m_Systems) {
+			json js;
+
+			for (const auto& entry : system->get_settings()) {
+				auto fetch = entry.m_GetFn();
+
+				if (fetch.size() != 1)
+					throw std::runtime_error("Currently only singular variables are supported");
+
+				js.emplace(
+					fetch.begin().key(),
+					*fetch.begin()
+				);
+			}
+
+			settings[system->get_name()] = js;
+		}
+
+		std::ofstream out(k_SettingsFilename);
+		if (!out.good())
+			g_Log << "Failed to write to " << k_SettingsFilename;
+		else {
+			out << settings.dump(2);
+			g_Log << "Saved settings";
+		}
+	}
+
+	void Engine::load_settings() {
+		using namespace nlohmann;
+		using namespace std;
+
+		ifstream in(k_SettingsFilename);
+		if (in.good()) {
+			json settings;
+			in >> settings;
+
+			for (const auto& ptr : m_Systems) {
+				auto it = settings.find(ptr->get_name());
+
+				if (it != settings.end()) {
+					for (const auto& entry : ptr->get_settings())
+						entry.m_SetFn(*it);
+				}
+				else
+					g_Log << "No settings for subsystem " << ptr->get_name();
+			}
+
+			if (m_Application) {
+				auto it = settings.find(m_Application->get_name());
+
+				if (it != settings.end()) {
+					for (const auto& entry : m_Application->get_settings())
+						entry.m_SetFn(*it);
+				}
+				else
+					g_Log << "No application settings for " << m_Application->get_name();
+			}
+		}
+		else
+			g_Log << "No configuration found, using defaults for all systems";
+
+		g_Log << "Settings loaded";
+	}
+
 	void Engine::start_systems() {
 		// first try and load subsystem settings
-		{
-			using namespace nlohmann;
-			using namespace std;
-
-			ifstream in(k_SettingsFilename);
-			if (in.good()) {
-				json settings;
-				in >> settings;
-
-				for (const auto& ptr : m_Systems) {
-					auto it = settings.find(ptr->get_name());
-
-					if (it != settings.end()) {
-						for (const auto& entry : ptr->get_settings())
-							entry.m_SetFn(*it);
-					}
-					else
-						g_Log << "No settings for subsystem " << ptr->get_name();
-				}
-
-				if (m_Application) {
-					auto it = settings.find(m_Application->get_name());
-
-					if (it != settings.end()) {
-						for (const auto& entry : m_Application->get_settings())
-							entry.m_SetFn(*it);
-					}
-					else
-						g_Log << "No application settings for " << m_Application->get_name();
-				}
-			}
-			else
-				g_Log << "No configuration found, using defaults for all systems";
-		}
+		load_settings();
 
 		// start subsystem initialization; keep track of (satisfied) dependencies and store the order
 		{
@@ -217,56 +276,6 @@ namespace hecate {
 			}
 		}
 
-		// traverse and consolidate settings from all systems and the current application
-		{
-			using namespace nlohmann;
-			
-			json settings;
-
-			if (m_Application) {
-				json js;
-
-				for (const auto& entry : m_Application->get_settings()) {
-					auto fetch = entry.m_GetFn();
-					
-					if (fetch.size() != 1)
-						throw std::runtime_error("Currently only singular variables are supported");
-
-					js.emplace(
-						 fetch.begin().key(),
-						*fetch.begin()
-					);
-				}
-
-				settings[m_Application->get_name()] = js;
-			}
-
-			// now the rest of the subsystems
-			for (const auto& system : m_Systems) {
-				json js;
-
-				for (const auto& entry : system->get_settings()) {
-					auto fetch = entry.m_GetFn();
-
-					if (fetch.size() != 1)
-						throw std::runtime_error("Currently only singular variables are supported");
-
-					js.emplace(
-						 fetch.begin().key(),
-						*fetch.begin()
-					);
-				}
-
-				settings[system->get_name()] = js;
-			}
-
-			std::ofstream out(k_SettingsFilename);
-			if (!out.good())
-				g_Log << "Failed to write to " << k_SettingsFilename;
-			else {
-				out << settings.dump(2);
-				g_Log << "Saved settings";
-			}
-		}
+		save_settings();
 	}
 }

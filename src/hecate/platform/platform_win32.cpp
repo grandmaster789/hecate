@@ -1,6 +1,9 @@
 #include "platform.h"
 #include "../dependencies.h"
 #include "../core/engine.h"
+#include "../input/mouse.h"
+#include "../input/keyboard.h"
+#include "../input/input.h"
 
 #include <thread>
 #include <chrono>
@@ -29,7 +32,7 @@ namespace {
 		if (!userdata)
 			return DefWindowProc(window_handle, message, wparam, lparam);
 
-		auto* platform_object = (hecate::Platform*)userdata;
+		//auto* platform_object = (hecate::Platform*)userdata;
 
 		// TODO ~~ forward key/mouse events to Input subsystem
 		// notifications: https://docs.microsoft.com/en-us/windows/win32/winmsg/window-notifications
@@ -124,6 +127,8 @@ namespace hecate {
 	Platform::Platform():
 		System("Platform")
 	{
+		add_dependency("Input"); // we need this system to be available so that we can do keybinding etc
+
 		register_setting("main_window_width",  &m_MainWindowWidth);
 		register_setting("main_window_height", &m_MainWindowHeight);
 		register_setting("display_device",     &m_DisplayDeviceIdx);
@@ -178,20 +183,25 @@ namespace hecate {
 		uint32_t window_style_ex = // https://docs.microsoft.com/en-us/windows/win32/winmsg/extended-window-styles
 			WS_EX_APPWINDOW;       // Forces a top-level window onto the taskbar when the window is visible
 
+		if (m_MainWindowWidth == -1)
+			m_MainWindowWidth = CW_USEDEFAULT;
+		if (m_MainWindowHeight == -1)
+			m_MainWindowHeight = CW_USEDEFAULT;
+
 		// https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexa
 		g_WindowHandle = CreateWindowEx(
 			window_style_ex,
 			k_HecateWindowClassName,
 			k_HecateApplicationName,
 			window_style,
-			CW_USEDEFAULT,    // x (left)
-			CW_USEDEFAULT,    // y (top)
-			CW_USEDEFAULT,    // width 
-			CW_USEDEFAULT,    // height
-			nullptr,          // parent window handle
-			nullptr,          // menu handle
-			g_InstanceHandle, // program instance
-			nullptr           // lpParam
+			CW_USEDEFAULT,      // x (left)
+			CW_USEDEFAULT,      // y (top)
+			m_MainWindowWidth,  // width 
+			m_MainWindowHeight, // height
+			nullptr,            // pare nt window handle
+			nullptr,            // menu handle
+			g_InstanceHandle,   // program instance
+			nullptr             // lpParam
 		);
 
 		if (!g_WindowHandle) {
@@ -201,7 +211,56 @@ namespace hecate {
 
 		// put a pointer to this Platform object in the Window userdata
 		SetWindowLongPtr(g_WindowHandle, GWLP_USERDATA, (LONG_PTR)this);
-		ShowWindow(g_WindowHandle, SW_SHOW); // https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow
+
+		// apply sizes, center the window
+		{	
+			auto display_mode = get_current_displaymode(display_monitors[m_DisplayDeviceIdx]);
+
+			// extract virtual desktop coordinates
+			int virtual_x      = display_mode.dmPosition.x;
+			int virtual_y      = display_mode.dmPosition.y;
+			int virtual_width  = display_mode.dmPelsWidth;
+			int virtual_height = display_mode.dmPelsHeight;
+
+			// create a centered rect on the associated display device
+			RECT rect;
+
+			GetClientRect(g_WindowHandle, &rect);
+			m_MainWindowWidth  = rect.right - rect.left;
+			m_MainWindowHeight = rect.bottom - rect.top;
+
+			rect.left   = virtual_x + (virtual_width  - m_MainWindowWidth)  / 2;
+			rect.top    = virtual_y + (virtual_height - m_MainWindowHeight) / 2;
+			rect.right  = rect.left + m_MainWindowWidth;
+			rect.bottom = rect.top  + m_MainWindowHeight;
+
+			// https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowpos
+			SetWindowPos(
+				g_WindowHandle,
+				HWND_TOP, // hWndInsertAfter
+				rect.left,
+				rect.top,
+				rect.right - rect.left,
+				rect.bottom - rect.top,
+				0
+			);
+
+			ShowWindow(g_WindowHandle, SW_SHOW); // https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow
+
+			GetWindowRect(g_WindowHandle, &rect);
+			RECT client_rect;
+			GetClientRect(g_WindowHandle, &client_rect);
+
+			g_Log << std::format(
+				"({}x{}) Window created at ({}, {}); Client rect is {}x{}",
+				rect.right - rect.left,
+				rect.bottom - rect.top,
+				rect.left,
+				rect.top,
+				client_rect.right - client_rect.left,
+				client_rect.bottom - client_rect.top
+			);
+		}		
 
 		// setup timing
 		{
@@ -209,6 +268,14 @@ namespace hecate {
 			QueryPerformanceFrequency(&frequency);                            // https://docs.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancefrequency
 			g_ClockFrequency = 1.0 / static_cast<double>(frequency.QuadPart);
 			QueryPerformanceCounter(&g_StartTime);                            // https://docs.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancecounter
+		}
+
+		// setup input devices (that are coupled to the window)
+		{
+			auto* input_system = m_Engine->get<Input>();
+
+			m_Keyboard = std::make_unique<input::Keyboard>(input_system);
+			m_Mouse    = std::make_unique<input::Mouse>(input_system);
 		}
 
 		return true;
@@ -238,6 +305,11 @@ namespace hecate {
 		}
 	}
 
+	unsigned int Platform::get_dpi() const noexcept {
+		// if the window moves to another monitor the value may change
+		return GetDpiForWindow(g_WindowHandle);
+	}
+
 	double Platform::get_absolute_time() {
 		if (!g_ClockFrequency) {
 			g_LogWarning << "Clock frequency is unknown";
@@ -254,9 +326,13 @@ namespace hecate {
 
 		Sleep(static_cast<DWORD>(milliseconds));
 	}
-}
 
-namespace hecate {
+	std::vector<const char*> Platform::get_required_vulkan_extensions() {
+		return {
+			"VK_KHR_win32_surface" // https://www.khronos.org/registry/vulkan/specs/1.2-extensions/html/vkspec.html#VK_KHR_win32_surface
+		};
+	}
+
 	std::wstring to_wstring(const std::string& text) {
 		if (text.empty())
 			return L"";
