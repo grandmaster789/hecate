@@ -17,21 +17,21 @@ namespace hecate::input {
             m_Manager->unregister_device(this);
     }
 
-    bool Mouse::is_down(eButton button) const {
+    bool Mouse::is_down(e_Button button) const {
         switch (button) {
-        case eButton::left:   return m_Buttons[0];
-        case eButton::middle: return m_Buttons[1];
-        case eButton::right:  return m_Buttons[2];
+        case e_Button::left:   return m_Buttons[0];
+        case e_Button::middle: return m_Buttons[1];
+        case e_Button::right:  return m_Buttons[2];
         default:
             throw std::runtime_error("Unsupported mouse button");
         }
     }
 
-    bool Mouse::is_up(eButton button) const {
+    bool Mouse::is_up(e_Button button) const {
         switch (button) {
-        case eButton::left:   return !m_Buttons[0];
-        case eButton::middle: return !m_Buttons[1];
-        case eButton::right:  return !m_Buttons[2];
+        case e_Button::left:   return !m_Buttons[0];
+        case e_Button::middle: return !m_Buttons[1];
+        case e_Button::right:  return !m_Buttons[2];
         default:
             throw std::runtime_error("Unsupported mouse button");
         }
@@ -41,13 +41,13 @@ namespace hecate::input {
         return { m_X, m_Y };
     }
 
-    void Mouse::set_state(eButton button, bool pressed) {
+    void Mouse::set_state(e_Button button, bool pressed) {
         int idx = 0;
 
         switch (button) {
-        case eButton::left:   idx = 0; break;
-        case eButton::middle: idx = 1; break;
-        case eButton::right:  idx = 2; break;
+        case e_Button::left:   idx = 0; break;
+        case e_Button::middle: idx = 1; break;
+        case e_Button::right:  idx = 2; break;
         default:
             throw std::runtime_error("Unsupported button");
         }
@@ -77,7 +77,7 @@ namespace hecate::input {
         }
     }
 
-    void Mouse::do_double_click(eButton button) {
+    void Mouse::do_double_click(e_Button button) {
         broadcast(OnDoubleClick{ this, m_X, m_Y, button });
     }
 
@@ -93,11 +93,11 @@ namespace hecate::input {
         broadcast(OnLeaveWindow{ this });
     }
 
-    std::ostream& operator<<(std::ostream& os, const Mouse::eButton& button) {
+    std::ostream& operator<<(std::ostream& os, const Mouse::e_Button& button) {
         switch (button) {
-        case Mouse::eButton::left:   os << "Left";   break;
-        case Mouse::eButton::middle: os << "Middle"; break;
-        case Mouse::eButton::right:  os << "Right";  break;
+        case Mouse::e_Button::left:   os << "Left";   break;
+        case Mouse::e_Button::middle: os << "Middle"; break;
+        case Mouse::e_Button::right:  os << "Right";  break;
 
         default:
             os << "[unknown]"; 

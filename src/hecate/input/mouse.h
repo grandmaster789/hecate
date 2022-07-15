@@ -16,7 +16,7 @@ namespace hecate {
 
         class Mouse {
         public:
-            enum class eButton {
+            enum class e_Button {
                 left,
                 right,
                 middle
@@ -30,16 +30,16 @@ namespace hecate {
             Mouse             (Mouse&&)      = delete;
             Mouse& operator = (Mouse&&)      = delete;
 
-            bool is_down(eButton button) const;
-            bool is_up(eButton button) const;
+            bool is_down(e_Button button) const;
+            bool is_up  (e_Button button) const;
 
             std::pair<float, float> get_position() const;
 
             // These set the state and broadcast the appropriate event
-            void set_state(eButton button, bool pressed);
+            void set_state(e_Button button, bool pressed);
             void set_position(float x, float y);
 
-            void do_double_click(eButton button);
+            void do_double_click(e_Button button);
             void do_scroll(int amount);
             void do_enter_window();
             void do_leave_window();
@@ -55,24 +55,24 @@ namespace hecate {
             };
 
             struct OnButtonPressed {
-                Mouse*  m_Mouse;
-                float   m_X;
-                float   m_Y;
-                eButton m_Button;
+                Mouse*   m_Mouse;
+                float    m_X;
+                float    m_Y;
+                e_Button m_Button;
             };
 
             struct OnButtonReleased {
-                Mouse*  m_Mouse;
-                float   m_X;
-                float   m_Y;
-                eButton m_Button;
+                Mouse*   m_Mouse;
+                float    m_X;
+                float    m_Y;
+                e_Button m_Button;
             };
 
             struct OnDoubleClick {
-                Mouse*  m_Mouse;
-                float   m_X;
-                float   m_Y;
-                eButton m_Button;
+                Mouse*   m_Mouse;
+                float    m_X;
+                float    m_Y;
+                e_Button m_Button;
             };
 
             struct OnScroll {
@@ -97,15 +97,15 @@ namespace hecate {
             float m_Y = 0;
         };
 
-        std::ostream& operator << (std::ostream& os, const Mouse::eButton& button);
+        std::ostream& operator << (std::ostream& os, const Mouse::e_Button& button);
                                   
-        std::ostream& operator << (std::ostream& os, const Mouse::OnMoved& mm);
-        std::ostream& operator << (std::ostream& os, const Mouse::OnButtonPressed& bp);
+        std::ostream& operator << (std::ostream& os, const Mouse::OnMoved&          mm);
+        std::ostream& operator << (std::ostream& os, const Mouse::OnButtonPressed&  bp);
         std::ostream& operator << (std::ostream& os, const Mouse::OnButtonReleased& br);
-        std::ostream& operator << (std::ostream& os, const Mouse::OnDoubleClick& bc);
-        std::ostream& operator << (std::ostream& os, const Mouse::OnScroll& ms);
-        std::ostream& operator << (std::ostream& os, const Mouse::OnEnterWindow& ew);
-        std::ostream& operator << (std::ostream& os, const Mouse::OnLeaveWindow& lw);
+        std::ostream& operator << (std::ostream& os, const Mouse::OnDoubleClick&    bc);
+        std::ostream& operator << (std::ostream& os, const Mouse::OnScroll&         ms);
+        std::ostream& operator << (std::ostream& os, const Mouse::OnEnterWindow&    ew);
+        std::ostream& operator << (std::ostream& os, const Mouse::OnLeaveWindow&    lw);
 
         std::ostream& operator << (std::ostream& os, const Mouse& m);
     }

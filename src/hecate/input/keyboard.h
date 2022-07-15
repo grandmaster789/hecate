@@ -9,7 +9,7 @@ namespace hecate {
         class Keyboard {
         public:
             // grouped (groups in random order though)
-            enum class eKey {
+            enum class e_Key {
                 undefined,
 
                 a,
@@ -105,20 +105,20 @@ namespace hecate {
             Keyboard             (Keyboard&&)                 = delete;
             Keyboard& operator = (Keyboard&&) = delete;
 
-            bool is_down(eKey key) const;
-            bool is_up  (eKey key) const;
+            bool is_down(e_Key key) const;
+            bool is_up  (e_Key key) const;
 
-            void set_state(eKey key, bool pressed);
+            void set_state(e_Key key, bool pressed);
 
             // --------------------- Events -----------------------
             struct OnKeyPressed {
                 Keyboard* kbd;
-                eKey      key;
+                e_Key     key;
             };
 
             struct OnKeyReleased {
                 Keyboard* kbd;
-                eKey      key;
+                e_Key     key;
             };
 
         private:
@@ -127,8 +127,8 @@ namespace hecate {
             bool m_Keys[256] = {};
         };
 
-        std::ostream& operator<<(std::ostream& os, const Keyboard::eKey& key);
-        std::ostream& operator<<(std::ostream& os, const Keyboard::OnKeyPressed& kp);
-        std::ostream& operator<<(std::ostream& os, const Keyboard::OnKeyReleased& kr);
+        std::ostream& operator << (std::ostream& os, const Keyboard::e_Key&         key);
+        std::ostream& operator << (std::ostream& os, const Keyboard::OnKeyPressed&  kp);
+        std::ostream& operator << (std::ostream& os, const Keyboard::OnKeyReleased& kr);
     }
 }

@@ -18,19 +18,19 @@ namespace hecate::input {
             m_Manager->unregister_device(this);
     }
 
-    bool Keyboard::is_down(eKey key) const {
-        return m_Keys[static_cast<std::underlying_type_t<eKey>>(key)];
+    bool Keyboard::is_down(e_Key key) const {
+        return m_Keys[static_cast<std::underlying_type_t<e_Key>>(key)];
     }
 
-    bool Keyboard::is_up(eKey key) const {
+    bool Keyboard::is_up(e_Key key) const {
         return !is_down(key);
     }
 
-    void Keyboard::set_state(eKey key, bool isPressed) {
+    void Keyboard::set_state(e_Key key, bool isPressed) {
         bool current = is_down(key);
 
         if (current != isPressed) {
-            m_Keys[static_cast<std::underlying_type_t<eKey>>(key)] = isPressed;
+            m_Keys[static_cast<std::underlying_type_t<e_Key>>(key)] = isPressed;
 
             if (isPressed)
                 broadcast(OnKeyPressed{ this, key });
@@ -39,8 +39,8 @@ namespace hecate::input {
         }
     }
 
-    std::ostream& operator<<(std::ostream& os, const Keyboard::eKey& key) {
-        using eKey = Keyboard::eKey;
+    std::ostream& operator<<(std::ostream& os, const Keyboard::e_Key& key) {
+        using eKey = Keyboard::e_Key;
 
         switch (key) {
         case eKey::a: os << "A"; break;

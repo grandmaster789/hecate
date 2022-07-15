@@ -2,9 +2,14 @@
 
 #include "app/application.h"
 #include "core/engine.h"
+#include "input/keyboard.h"
+#include "input/mouse.h"
+
+using namespace hecate;
 
 class HecateApplication :
-	public hecate::Application
+	public Application,
+	public MessageHandler<input::Keyboard::OnKeyPressed>
 {
 public:
 	HecateApplication():
@@ -23,10 +28,17 @@ public:
 	void shutdown() override {
 		g_Log << "Application shutting down";
 	}
+
+	void operator()(const input::Keyboard::OnKeyPressed& kp) {
+		if (kp.key == input::Keyboard::e_Key::escape)
+			m_Engine->stop();
+
+		g_Log << "Key pressed: " << kp.key;
+	}
 };
 
 int main() {
-	auto& engine = hecate::Engine::instance();
+	auto& engine = Engine::instance();
 
 	engine.set_application<HecateApplication>();
 	engine.start();

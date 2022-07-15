@@ -30,6 +30,12 @@ namespace hecate {
 
 		// Filesystem
 
+		// HID
+		      input::Keyboard* get_keyboard();
+		const input::Keyboard* get_keyboard() const;
+		      input::Mouse*    get_mouse();
+		const input::Mouse*    get_mouse() const;
+
 		// Clock
 		static double get_absolute_time(); // time in seconds since starting the program
 		static void   sleep_ms(uint64_t milliseconds);
