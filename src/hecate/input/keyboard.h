@@ -5,10 +5,17 @@
 namespace hecate {
     class Input;
 
+    namespace platform {
+        class Window;
+    }
+
     namespace input {
         class Keyboard {
         public:
+            using Window = platform::Window;
+
             // grouped (groups in random order though)
+            // NOTE not *all* keys are represented here - should add as needed
             enum class e_Key {
                 undefined,
 
@@ -100,25 +107,31 @@ namespace hecate {
             Keyboard(Input* manager);
             ~Keyboard();
 
-            Keyboard             (const Keyboard&) = delete;
-            Keyboard& operator = (const Keyboard&) = delete;
-            Keyboard             (Keyboard&&)                 = delete;
-            Keyboard& operator = (Keyboard&&) = delete;
+            Keyboard             (const Keyboard&)     = delete;
+            Keyboard& operator = (const Keyboard&)     = delete;
+            Keyboard             (Keyboard&&) noexcept = default;
+            Keyboard& operator = (Keyboard&&) noexcept = default;
 
             bool is_down(e_Key key) const;
             bool is_up  (e_Key key) const;
 
-            void set_state(e_Key key, bool pressed);
+            void set_state(
+                e_Key   key, 
+                bool    pressed, 
+                Window* win = nullptr // (optional) pointer to the active window handling the input
+            );
 
             // --------------------- Events -----------------------
             struct OnKeyPressed {
                 Keyboard* kbd;
                 e_Key     key;
+                Window*   win; // the active window
             };
 
             struct OnKeyReleased {
                 Keyboard* kbd;
                 e_Key     key;
+                Window*   win; // the active window
             };
 
         private:

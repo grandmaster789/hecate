@@ -26,16 +26,16 @@ namespace hecate::input {
         return !is_down(key);
     }
 
-    void Keyboard::set_state(e_Key key, bool isPressed) {
+    void Keyboard::set_state(e_Key key, bool isPressed, Window* win) {
         bool current = is_down(key);
 
         if (current != isPressed) {
             m_Keys[static_cast<std::underlying_type_t<e_Key>>(key)] = isPressed;
 
             if (isPressed)
-                broadcast(OnKeyPressed{ this, key });
+                broadcast(OnKeyPressed{ this, key, win });
             else
-                broadcast(OnKeyReleased{ this, key });
+                broadcast(OnKeyReleased{ this, key, win });
         }
     }
 

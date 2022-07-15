@@ -25,10 +25,10 @@ namespace hecate {
             Mouse(Input* manager);
             ~Mouse();
 
-            Mouse             (const Mouse&) = delete;
-            Mouse& operator = (const Mouse&) = delete;
-            Mouse             (Mouse&&)      = delete;
-            Mouse& operator = (Mouse&&)      = delete;
+            Mouse             (const Mouse&)     = delete;
+            Mouse& operator = (const Mouse&)     = delete;
+            Mouse             (Mouse&&) noexcept = default;
+            Mouse& operator = (Mouse&&) noexcept = default;
 
             bool is_down(e_Button button) const;
             bool is_up  (e_Button button) const;

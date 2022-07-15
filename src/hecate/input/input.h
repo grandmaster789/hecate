@@ -28,8 +28,8 @@ namespace hecate {
         void register_device  (Mouse* m);
         void unregister_device(Mouse* m);
 
-        const Keyboard& get_keyboard() const; // typically the system will only have one keyboard
-        const Mouse&    get_mouse()    const; // typically the system will only have one mouse
+        const Keyboard& get_keyboard() const; // typically the system will only have one keyboard [NOTE] keyboards have a specific state for each window
+        const Mouse&    get_mouse()    const; // typically the system will only have one mouse    [NOTE] mice      have a specific state for each window
 
         const std::vector<Keyboard*>& get_keyboards() const;
         const std::vector<Mouse*>&    get_mice()      const;

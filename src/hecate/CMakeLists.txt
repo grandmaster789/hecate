@@ -22,6 +22,10 @@ add_library(
     "input/keyboard.cpp"
     "input/mouse.cpp"
     $<${WIN32}:${CMAKE_CURRENT_SOURCE_DIR}/platform/platform_win32.cpp>
+    "platform/window.h" 
+    $<${WIN32}:${CMAKE_CURRENT_SOURCE_DIR}/platform/window_win32.cpp>
+    "platform/platform_strings.h" 
+    $<${WIN32}:${CMAKE_CURRENT_SOURCE_DIR}/platform/platform_strings_win32.cpp>
 )
 
 find_package(fmt CONFIG REQUIRED)

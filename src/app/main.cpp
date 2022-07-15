@@ -4,6 +4,7 @@
 #include "core/engine.h"
 #include "input/keyboard.h"
 #include "input/mouse.h"
+#include "platform/window.h"
 
 using namespace hecate;
 
@@ -31,7 +32,7 @@ public:
 
 	void operator()(const input::Keyboard::OnKeyPressed& kp) {
 		if (kp.key == input::Keyboard::e_Key::escape)
-			m_Engine->stop();
+			kp.win->close();
 
 		g_Log << "Key pressed: " << kp.key;
 	}
