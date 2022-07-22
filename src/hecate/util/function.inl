@@ -6,31 +6,31 @@
 namespace hecate::util {
 	template <typename T, typename...Args>
 	template <typename Fn>
-	constexpr Function<T(Args...)>::Function(Fn x) :
+	Function<T(Args...)>::Function(Fn x) noexcept:
 		m_Storage(std::make_unique<Implementation<decltype(x)>>(x))
 	{
 	}
 
 	template <typename T, typename...Args>
-	constexpr Function<T(Args...)>::Function(const Function& fn):
+	Function<T(Args...)>::Function(const Function& fn):
 		m_Storage(fn.m_Storage->clone())
 	{
 	}
 
 	template <typename T, typename...Args>
-	constexpr Function<T(Args...)>& Function<T(Args...)>::operator = (const Function<T(Args...)>& fn) {
+	Function<T(Args...)>& Function<T(Args...)>::operator = (const Function<T(Args...)>& fn) {
 		m_Storage.reset(fn.m_Storage->clone());
 		return *this;
 	}
 
 	template <typename T, typename...Args>
-	constexpr T Function<T(Args...)>::operator()(Args&&... args) {
+	T Function<T(Args...)>::operator()(Args&&... args) {
 		return m_Storage->call(std::forward<Args>(args)...);
 	}
 
 	template <typename T, typename...Args>
 	template <typename Fn>
-	constexpr Function<T(Args...)>::Implementation<Fn>::Implementation(Fn x):
+	Function<T(Args...)>::Implementation<Fn>::Implementation(Fn x):
 		m_StoredFunction(std::move(x))
 	{
 	}
@@ -54,13 +54,13 @@ namespace hecate::util {
 
 	template <typename T, typename...Args>
 	template <typename Fn>
-	constexpr Function<T(Args...)>::Interface* Function<T(Args...)>::Implementation<Fn>::clone() const {
+	Function<T(Args...)>::Interface* Function<T(Args...)>::Implementation<Fn>::clone() const {
 		return new Implementation(*this);
 	}
 
 	template <typename T, typename...Args>
 	template <typename Fn>
-	constexpr T Function<T(Args...)>::Implementation<Fn>::call(Args&&... args) const {
+	T Function<T(Args...)>::Implementation<Fn>::call(Args&&... args) const {
 		return std::invoke(
 			m_StoredFunction, 
 			std::forward<Args>(args)...

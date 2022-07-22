@@ -26,6 +26,11 @@ add_library(
     $<${WIN32}:${CMAKE_CURRENT_SOURCE_DIR}/platform/window_win32.cpp>
     "platform/platform_strings.h" 
     $<${WIN32}:${CMAKE_CURRENT_SOURCE_DIR}/platform/platform_strings_win32.cpp>
+    "util/algorithm.h"
+    "util/flat_map.h"
+    "util/function.h"
+    "util/typemap.h"
+    
 )
 
 find_package(fmt CONFIG REQUIRED)

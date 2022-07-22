@@ -83,13 +83,4 @@ namespace test {
 		REQUIRE(x == 9);
 		REQUIRE(b.m_Value == 4);
 	}
-
-	TEST_CASE("function_constexpr", "[hecate::util]") {
-		using namespace hecate::util;
-
-		//constexpr Function<int(int)> fn = [](int x) { return x * x; };
-		//constexpr static int y = fn(16);
-
-		//REQUIRE(y == 256);
-	}
 }
