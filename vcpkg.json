@@ -26,6 +26,10 @@
     {
       "name": "rang",
       "version>=": "3.2"
+    },
+    {
+      "name": "glfw3",
+      "version>=": "3.3.7"
     }
   ],
   "builtin-baseline": "bae8f8c7d837c631ca72daec4b14e243824135a5"

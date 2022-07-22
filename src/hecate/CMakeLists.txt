@@ -33,6 +33,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Vulkan REQUIRED)
 find_package(unofficial-concurrentqueue CONFIG REQUIRED)
 find_package(unofficial-vulkan-memory-allocator CONFIG REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
 
 find_library(SHADERC_LIB shaderc_combined $ENV{VULKAN_SDK}/lib)
 
@@ -56,7 +57,8 @@ PRIVATE
     Vulkan::Vulkan
     nlohmann_json::nlohmann_json
     fmt::fmt
-    unofficial::concurrentqueue::concurrentqueue    
+    unofficial::concurrentqueue::concurrentqueue
+    glfw
 )
 
 if (WIN32)

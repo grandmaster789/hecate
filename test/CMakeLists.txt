@@ -9,6 +9,7 @@ add_executable(
   "unittest.h"
   "unittest.cpp"
   "util/test_algorithm.cpp" 
+  "util/test_function.cpp"
 )
 
 include_directories(../src/hecate)

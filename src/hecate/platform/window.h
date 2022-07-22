@@ -24,6 +24,7 @@ namespace hecate {
 				int                height             = -1, // use -1 for default
 				int                display_device_idx = 0
 			);
+			~Window();
 
 			Window             (const Window&)     = delete;
 			Window& operator = (const Window&)     = delete;

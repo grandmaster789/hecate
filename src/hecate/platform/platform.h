@@ -12,6 +12,11 @@ namespace hecate {
 
 	namespace platform {
 		class Window;
+
+		// DLL
+		void*           load_dynamic_library(const char* name);
+		void            unload_dynamic_library(void* handle);
+		DynamicFunction get_dynamic_symbol(void* module_handle, const char* function_name);
 	}
 
 	//
@@ -30,10 +35,10 @@ namespace hecate {
 		void update()   override;
 		void shutdown() override;
 
-		// Filesystem
-
 		// WSI
 		void close(platform::Window* window);
+
+		// Filesystem
 
 		// Clock
 		static double get_absolute_time(); // time in seconds since starting the program

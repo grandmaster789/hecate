@@ -7,7 +7,11 @@
 #define HECATE_PLATFORM_LINUX 2
 
 // try to autodetect the platform
-#ifdef _WIN32
+#if defined(_WIN32)                          || \
+	(defined(__WIN32__) && !defined(_WIN32)) || \
+	defined(WIN32)                           || \
+	defined(__MINGW32__)
+
 	#define HECATE_PLATFORM HECATE_PLATFORM_WINDOWS
 #else // this is very crude
 	#define HECATE_PLATFORM HECATE_PLATFORM_LINUX
@@ -149,4 +153,7 @@ namespace hecate {
 	static constexpr e_Platform  k_Platform  = e_Platform ::current;
 	static constexpr e_Compiler  k_Compiler  = e_Compiler ::current;
 	static constexpr e_Build     k_Build     = e_Build    ::current;
+
+	// function pointers for DLLs
+	using DynamicFunction = void(*)();
 }

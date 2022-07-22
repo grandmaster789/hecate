@@ -146,12 +146,12 @@ namespace {
 		LPARAM lp
 	) {
 		// https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowlongptra
-		auto userdata = GetWindowLongPtr(window_handle, GWLP_USERDATA);
+		LONG_PTR userdata = GetWindowLongPtr(window_handle, GWLP_USERDATA);
 
 		if (userdata == NULL)
 			return DefWindowProc(window_handle, msg, wp, lp);
 
-		auto* win = (hecate::platform::Window*)userdata;
+		auto* win = std::bit_cast<hecate::platform::Window*>(userdata);
 
 		switch (msg) {
 		case WM_DESTROY: {
@@ -367,11 +367,18 @@ namespace hecate::platform {
 		}
 		
 		// put a pointer to this Platform object in the Window userdata
-		SetWindowLongPtr((HWND)m_NativeHandle, GWLP_USERDATA, (LONG_PTR)this);
+		SetWindowLongPtr(
+			reinterpret_cast<HWND>(m_NativeHandle), 
+			GWLP_USERDATA, 
+			std::bit_cast<LONG_PTR>(this)
+		);
 		
 		// extend the client (drawable) area across the titlebar + border
 		MARGINS margins{ 0, 0, 0, 1 };
-		DwmExtendFrameIntoClientArea((HWND)m_NativeHandle, &margins); // https://docs.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmextendframeintoclientarea
+		DwmExtendFrameIntoClientArea(
+			reinterpret_cast<HWND>(m_NativeHandle), 
+			&margins
+		); // https://docs.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmextendframeintoclientarea
 
 		// determine DPI
 		{
@@ -405,7 +412,7 @@ namespace hecate::platform {
 			rect.right  = rect.left + m_Width;
 			rect.bottom = rect.top  + m_Height;
 
-			// adjust window coordinates, trigger WM_NCCALCSIZE
+			// adjust window coordinates, set window size, trigger WM_NCCALCSIZE
 			// https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowpos
 			SetWindowPos(
 				(HWND)m_NativeHandle,
@@ -444,6 +451,13 @@ namespace hecate::platform {
 			auto* x    = Engine::instance().get<Input>();
 			m_Keyboard = std::make_unique<Keyboard>(x);
 			m_Mouse    = std::make_unique<Mouse>(x);
+		}
+	}
+
+	Window::~Window() {
+		if (m_NativeHandle) {
+			DestroyWindow(reinterpret_cast<HWND>(m_NativeHandle));
+			m_NativeHandle = nullptr;
 		}
 	}
 

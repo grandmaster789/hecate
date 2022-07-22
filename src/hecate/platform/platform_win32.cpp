@@ -17,6 +17,14 @@
 namespace {
 	double        g_ClockFrequency = 1;       // frequency in Hz
 	LARGE_INTEGER g_StartTime      = {};      // 
+
+	// do we want to centralize *all* platform specific stuff or categorize it per subsystem?
+	HMODULE                 g_DirectInputDLL   = nullptr;
+	hecate::DynamicFunction DirectInput8Create = nullptr; // keep the naming scheme from directX
+
+	HMODULE                 g_XInputDLL           = nullptr;
+	hecate::DynamicFunction XInputGetCapabilities = nullptr;
+	hecate::DynamicFunction XInputGetState        = nullptr;
 }
 
 namespace hecate {
@@ -32,7 +40,7 @@ namespace hecate {
 
 	bool Platform::init() {
 		System::init();
-		
+
 		// not sure if the VS_DPI_AWARE property does anything, so I'm also doing it in code
 		SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2); // https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setthreaddpiawarenesscontext
 
@@ -42,6 +50,19 @@ namespace hecate {
 			QueryPerformanceFrequency(&frequency);                            // https://docs.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancefrequency
 			g_ClockFrequency = 1.0 / static_cast<double>(frequency.QuadPart);
 			QueryPerformanceCounter(&g_StartTime);                            // https://docs.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancecounter
+		}
+
+		// setup directinput and xinput 
+		{
+			g_DirectInputDLL = reinterpret_cast<HMODULE>(platform::load_dynamic_library("dinput8.dll"));
+
+			if (!g_DirectInputDLL) {
+				g_LogError << "Failed to load direct input dll";
+
+				return false;
+			}
+
+			DirectInput8Create = platform::get_dynamic_symbol(g_DirectInputDLL, "DirectInput8Create");
 		}
 
 		// create main window
@@ -79,7 +100,24 @@ namespace hecate {
 	}
 
 	void Platform::shutdown() {
-		System::shutdown();		
+		System::shutdown();
+
+		if (g_DirectInputDLL)
+			platform::unload_dynamic_library(g_DirectInputDLL);
+	}
+
+	namespace platform {
+		void* load_dynamic_library(const char* name) {
+			return LoadLibraryA(name);
+		}
+
+		void unload_dynamic_library(void* handle) {
+			FreeLibrary(reinterpret_cast<HMODULE>(handle));
+		}
+
+		DynamicFunction get_dynamic_symbol(void* handle, const char* name) {
+			return reinterpret_cast<DynamicFunction>(GetProcAddress(reinterpret_cast<HMODULE>(handle), name));
+		}
 	}
 
 	void Platform::close(platform::Window* window) {

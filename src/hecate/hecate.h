@@ -5,6 +5,7 @@
 
 #include "util/algorithm.h"
 #include "util/flat_map.h"
+#include "util/function.h"
 #include "util/typemap.h"
 
 // pre-declare classes
