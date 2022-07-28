@@ -55,6 +55,7 @@ namespace hecate {
 		int m_MainWindowHeight = -1; // use -1 for OS default
 		int m_DisplayDeviceIdx = 0;
 
-		std::vector<WindowPtr> m_Windows;
+		std::vector<WindowPtr>         m_Windows;
+		std::vector<platform::Window*> m_ShouldClose;
 	};
 }

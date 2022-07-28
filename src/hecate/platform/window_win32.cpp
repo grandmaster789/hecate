@@ -107,10 +107,10 @@ namespace {
 		g_KeyMapping.assign(VK_OEM_PERIOD, eKey::period);
 
 		// navigational keys
-		g_KeyMapping.assign(VK_UP,    eKey::up);
-		g_KeyMapping.assign(VK_DOWN,  eKey::down);
-		g_KeyMapping.assign(VK_LEFT,  eKey::left);
-		g_KeyMapping.assign(VK_RIGHT, eKey::right);
+		g_KeyMapping.assign(VK_UP,    eKey::up_arrow);
+		g_KeyMapping.assign(VK_DOWN,  eKey::down_arrow);
+		g_KeyMapping.assign(VK_LEFT,  eKey::left_arrow);
+		g_KeyMapping.assign(VK_RIGHT, eKey::right_arrow);
 
 		g_KeyMapping.assign(VK_PRIOR, eKey::pg_up);
 		g_KeyMapping.assign(VK_NEXT,  eKey::pg_down);
@@ -172,17 +172,52 @@ namespace {
 			}
 			break;
 
-		case WM_KEYDOWN:
-		case WM_SYSKEYDOWN: {
-				auto key = find_key_code(wp);
-				win->get_keyboard()->set_state(key, true, win);
-			} 
-			break;
-
+		// NOTE this is the 'legacy' approach; we might use RawInput in the future
 		case WM_KEYUP:
-		case WM_SYSKEYUP: {
-				auto key = find_key_code(wp);
-				win->get_keyboard()->set_state(key, false, win);
+		case WM_KEYDOWN:
+		case WM_SYSKEYUP:
+		case WM_SYSKEYDOWN: 
+			{
+				using eKey = hecate::input::Keyboard::e_Key;
+
+				bool pressed = (msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN);
+				bool is_extended = (HIWORD(lp) & KF_EXTENDED) == KF_EXTENDED;
+
+				eKey key = eKey::undefined;
+
+				// special case to determine left/right alt
+				if (wp == VK_MENU) {
+					if (is_extended)
+						key = eKey::right_alt;
+					else
+						key = eKey::left_alt;
+				}
+
+				// special case for left/right control
+				if (wp == VK_CONTROL) {
+					if (is_extended)
+						key = eKey::right_ctrl;
+					else
+						key = eKey::left_ctrl;
+				}
+
+				// extra special case for left/right shift
+				if (wp == VK_SHIFT) {
+
+					// https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-mapvirtualkeya
+					uint32_t left_shift = MapVirtualKey(VK_LSHIFT, MAPVK_VK_TO_VSC);
+					uint32_t scancode = ((lp & (0xFF << 16)) >> 16);
+
+					if (scancode == left_shift)
+						key = eKey::left_shift;
+					else
+						key = eKey::right_shift;
+				}
+
+				if (key == eKey::undefined)
+					key = find_key_code(wp);
+
+				win->get_keyboard()->set_state(key, pressed, win);
 			} 
 			break;
 		}

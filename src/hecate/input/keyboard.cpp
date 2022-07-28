@@ -108,26 +108,32 @@ namespace hecate::input {
         case eKey::comma:  os << ","; break;
         case eKey::period: os << "."; break;
 
-        case eKey::ctrl:  os << "(ctrl)";  break;
-        case eKey::alt:   os << "(alt)";   break;
-        case eKey::shift: os << "(shift)"; break;
-        case eKey::space: os << "(space)"; break;
+        case eKey::ctrl:        os << "(ctrl)";        break;
+        case eKey::left_ctrl:   os << "(left ctrl)";   break;
+        case eKey::right_ctrl:  os << "(right ctrl)";  break;
+        case eKey::alt:         os << "(alt)";         break;
+        case eKey::left_alt:    os << "(left alt)";    break;
+        case eKey::right_alt:   os << "(right alt)";   break;
+        case eKey::shift:       os << "(shift)";       break;
+        case eKey::left_shift:  os << "(left shift)";  break;
+        case eKey::right_shift: os << "(right shift)"; break;
+        case eKey::space:       os << "(space)";       break;
 
         case eKey::tab:       os << "(tab)";       break;
         case eKey::enter:     os << "(enter)";     break;
         case eKey::escape:    os << "(escape)";    break;
         case eKey::backspace: os << "(backspace)"; break;
 
-        case eKey::up:      os << "(up)";        break;
-        case eKey::left:    os << "(left)";      break;
-        case eKey::right:   os << "(right)";     break;
-        case eKey::down:    os << "(down)";      break;
-        case eKey::pg_up:   os << "(page up)";   break;
-        case eKey::pg_down: os << "(page down)"; break;
-        case eKey::home:    os << "(home)";      break;
-        case eKey::end:     os << "(end)";       break;
-        case eKey::ins:     os << "(insert)";    break;
-        case eKey::del:     os << "(delete)";    break;
+        case eKey::up_arrow:    os << "(up)";        break;
+        case eKey::left_arrow:  os << "(left)";      break;
+        case eKey::right_arrow: os << "(right)";     break;
+        case eKey::down_arrow:  os << "(down)";      break;
+        case eKey::pg_up:       os << "(page up)";   break;
+        case eKey::pg_down:     os << "(page down)"; break;
+        case eKey::home:        os << "(home)";      break;
+        case eKey::end:         os << "(end)";       break;
+        case eKey::ins:         os << "(insert)";    break;
+        case eKey::del:         os << "(delete)";    break;
 
             // some keys that remain - caps lock, scroll lock, pause, printscreen,
             //                         windows, contextmenu

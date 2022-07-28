@@ -97,6 +97,15 @@ namespace hecate {
 				DispatchMessage(&msg);
 			}
 		}
+
+		std::erase_if(
+			m_Windows,
+			[this](const auto& uniqueptr) {
+				return util::contains(m_ShouldClose, uniqueptr.get());
+			}
+		);
+
+		m_ShouldClose.clear();
 	}
 
 	void Platform::shutdown() {
@@ -128,12 +137,7 @@ namespace hecate {
 			m_DisplayDeviceIdx = window->get_display_device_idx();
 		}
 
-		std::erase_if(
-			m_Windows, 
-			[window](const auto& ptr) { 
-				return ptr.get() == window;
-			}
-		);
+		m_ShouldClose.push_back(window);
 	}
 
 	double Platform::get_absolute_time() {
