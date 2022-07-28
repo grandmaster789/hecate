@@ -85,14 +85,6 @@ namespace hecate::input {
         broadcast(OnScroll{ this, amount });
     }
 
-    void Mouse::do_enter_window() {
-        broadcast(OnEnterWindow{ this });
-    }
-
-    void Mouse::do_leave_window() {
-        broadcast(OnLeaveWindow{ this });
-    }
-
     std::ostream& operator<<(std::ostream& os, const Mouse::e_Button& button) {
         switch (button) {
         case Mouse::e_Button::left:   os << "Left";   break;
@@ -138,20 +130,6 @@ namespace hecate::input {
 
     std::ostream& operator<<(std::ostream& os, const Mouse::OnScroll& ms) {
         os << "Mouse scroll: " << ms.m_ScrollAmount;
-
-        return os;
-    }
-
-    std::ostream& operator<<(std::ostream& os, const Mouse::OnEnterWindow& ew) {
-        (void)ew;
-        os << "Mouse entered window";
-
-        return os;
-    }
-
-    std::ostream& operator<<(std::ostream& os, const Mouse::OnLeaveWindow& lw) {
-        (void)lw;
-        os << "Mouse left window";
 
         return os;
     }

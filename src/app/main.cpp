@@ -10,7 +10,11 @@ using namespace hecate;
 
 class HecateApplication :
 	public Application,
-	public MessageHandler<input::Keyboard::OnKeyPressed>
+	public MessageHandler<input::Keyboard::OnKeyPressed>,
+	//public MessageHandler<input::Mouse::OnMoved>,
+	public MessageHandler<input::Mouse::OnScroll>,
+	public MessageHandler<input::Mouse::OnButtonPressed>,
+	public MessageHandler<input::Mouse::OnDoubleClick>
 {
 public:
 	HecateApplication():
@@ -35,6 +39,22 @@ public:
 			kp.win->close();
 
 		g_Log << "Key pressed: " << kp.key;
+	}
+
+	void operator()(const input::Mouse::OnMoved& mm) {
+		g_Log << std::format("({}, {})", mm.m_X, mm.m_Y);
+	}
+
+	void operator()(const input::Mouse::OnScroll& os) {
+		g_Log << "Scroll " << os.m_ScrollAmount;
+	}
+
+	void operator()(const input::Mouse::OnButtonPressed& bp) {
+		g_Log << "Clicked " << bp.m_Button << " @(" << bp.m_X << ", " << bp.m_Y << ")";
+	}
+
+	void operator()(const input::Mouse::OnDoubleClick& dc) {
+		g_Log << "Double " << dc.m_Button;
 	}
 };
 

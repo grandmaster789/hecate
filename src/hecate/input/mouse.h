@@ -41,9 +41,7 @@ namespace hecate {
 
             void do_double_click(e_Button button);
             void do_scroll(int amount);
-            void do_enter_window();
-            void do_leave_window();
-
+            
             // --------------------- Events -----------------------
             struct OnMoved {
                 Mouse* m_Mouse;
@@ -80,14 +78,6 @@ namespace hecate {
                 int    m_ScrollAmount;
             };
 
-            struct OnEnterWindow {
-                Mouse*  m_Mouse;
-            };
-
-            struct OnLeaveWindow {
-                Mouse*  m_Mouse;
-            };
-
         private:
             Input* m_Manager = nullptr;
 
@@ -104,8 +94,6 @@ namespace hecate {
         std::ostream& operator << (std::ostream& os, const Mouse::OnButtonReleased& br);
         std::ostream& operator << (std::ostream& os, const Mouse::OnDoubleClick&    bc);
         std::ostream& operator << (std::ostream& os, const Mouse::OnScroll&         ms);
-        std::ostream& operator << (std::ostream& os, const Mouse::OnEnterWindow&    ew);
-        std::ostream& operator << (std::ostream& os, const Mouse::OnLeaveWindow&    lw);
 
         std::ostream& operator << (std::ostream& os, const Mouse& m);
     }

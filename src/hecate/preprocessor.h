@@ -68,6 +68,7 @@
 
 	#include <SDKDDKVer.h>
 	#include <Windows.h>
+	#include <windowsx.h>
 	#include <intrin.h>
 	#include <debugapi.h>
 	#include <dwmapi.h>

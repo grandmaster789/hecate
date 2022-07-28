@@ -145,6 +145,8 @@ namespace {
 		WPARAM wp,
 		LPARAM lp
 	) {
+		using eMouseButton = hecate::input::Mouse::e_Button;
+
 		// https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowlongptra
 		LONG_PTR userdata = GetWindowLongPtr(window_handle, GWLP_USERDATA);
 
@@ -169,6 +171,17 @@ namespace {
 
 		case WM_DPICHANGED: {
 				// re-do layouting!
+			}
+			break;
+
+		case WM_SIZE: {
+				RECT rect;
+				GetClientRect(window_handle, &rect);
+				
+				int32_t width  = rect.right  - rect.left;
+				int32_t height = rect.bottom - rect.top;
+
+				win->update_size(width, height);
 			}
 			break;
 
@@ -220,6 +233,79 @@ namespace {
 				win->get_keyboard()->set_state(key, pressed, win);
 			} 
 			break;
+		
+		//https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mousemove
+		case WM_MOUSEMOVE: {
+				int32_t x_position = GET_X_LPARAM(lp);
+				int32_t y_position = GET_Y_LPARAM(lp);
+
+				// position is relative to upper-left corner of the client area
+				// -- rescale it so that it's -1.0f..1.0f range and becomes Y-up
+				float window_width  = static_cast<float>(win->get_width());
+				float window_height = static_cast<float>(win->get_height());
+
+				float relative_x = ( 2.0f * x_position / window_width)  - 1.0f;
+				float relative_y = (-2.0f * y_position / window_height) + 1.0f;
+
+				win->get_mouse()->set_position(
+					relative_x, 
+					relative_y
+				);
+			}
+			break;
+
+		// https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mousewheel
+		case WM_MOUSEWHEEL: {
+				int32_t delta_z = GET_WHEEL_DELTA_WPARAM(wp);
+
+				// different OSes may report this differently, so just interpret it as -1, 0 and +1
+				if (delta_z != 0) {
+					delta_z = std::clamp(delta_z, -1, 1);
+
+					win->get_mouse()->do_scroll(delta_z);
+				}
+			}
+			break;
+
+		case WM_LBUTTONDOWN:
+			win->get_mouse()->set_state(eMouseButton::left, true);
+			break;
+
+		case WM_LBUTTONUP:
+			win->get_mouse()->set_state(eMouseButton::left, false);
+			break;
+
+		case WM_LBUTTONDBLCLK:
+			win->get_mouse()->do_double_click(eMouseButton::left);
+			break;
+
+		case WM_MBUTTONDOWN:
+			win->get_mouse()->set_state(eMouseButton::middle, true);
+			break;
+
+		case WM_MBUTTONUP:
+			win->get_mouse()->set_state(eMouseButton::middle, false);
+			break;
+
+		case WM_MBUTTONDBLCLK:
+			// pretty exotic!
+			win->get_mouse()->do_double_click(eMouseButton::middle);
+			break;
+
+		case WM_RBUTTONDOWN:
+			win->get_mouse()->set_state(eMouseButton::right, true);
+			break;
+
+		case WM_RBUTTONUP:
+			win->get_mouse()->set_state(eMouseButton::right, false);
+			break;
+
+		case WM_RBUTTONDBLCLK:
+			// fancy :P
+			win->get_mouse()->do_double_click(eMouseButton::right);
+			break;
+
+			// how do many button mice messages work?
 		}
 		
 		return DefWindowProc(window_handle, msg, wp, lp);
@@ -500,8 +586,8 @@ namespace hecate::platform {
 		return (s_MainWindow == m_NativeHandle);
 	}
 
-	void Window::close() {
-		m_Owner->close(this);
+	bool Window::is_minimized() const noexcept {
+		return (IsIconic((HWND)m_NativeHandle) == TRUE);
 	}
 
 	int Window::get_width()  const noexcept {
@@ -514,6 +600,63 @@ namespace hecate::platform {
 
 	int Window::get_display_device_idx() const noexcept {
 		return m_DisplayDeviceIdx;
+	}
+
+	void Window::update_size(int new_width, int new_height) {
+		m_Width  = new_width;
+		m_Height = new_height;
+	}
+
+	void Window::set_size(int new_width, int new_height) {
+		RECT rect;
+		GetClientRect((HWND)m_NativeHandle, &rect);
+
+		// keep the same center
+		int center_x = rect.left + rect.right / 2;
+		int center_y = rect.top + rect.bottom / 2;
+
+		MoveWindow(
+			(HWND)m_NativeHandle,
+			center_x - new_width / 2,
+			center_y - new_height / 2,
+			new_width,
+			new_height,
+			true // repaint
+		);
+	}
+
+	void Window::set_position(int new_x, int new_y) {
+		RECT rect;
+		GetClientRect((HWND)m_NativeHandle, &rect);
+
+		// keep the same width/height;
+		int width  = rect.right - rect.left;
+		int height = rect.bottom - rect.top;
+
+		MoveWindow(
+			(HWND)m_NativeHandle,
+			new_x,
+			new_y,
+			width,
+			height,
+			true // repaint
+		);
+	}
+
+	void Window::close() {
+		m_Owner->close(this);
+	}
+
+	void Window::maximize() {
+		ShowWindow((HWND)m_NativeHandle, SW_MAXIMIZE);
+	}
+
+	void Window::minimize() {
+		ShowWindow((HWND)m_NativeHandle, SW_MINIMIZE);
+	}
+
+	void Window::restore() {
+		ShowWindow((HWND)m_NativeHandle, SW_RESTORE);
 	}
 
 	Window::Keyboard* Window::get_keyboard() noexcept {

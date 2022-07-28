@@ -32,11 +32,21 @@ namespace hecate {
 			Window& operator = (Window&&) noexcept = default;
 
 			[[nodiscard]] bool is_main_window() const noexcept;
-			void close();
+			[[nodiscard]] bool is_minimized() const noexcept;
 
 			[[nodiscard]] int get_width()              const noexcept;
 			[[nodiscard]] int get_height()             const noexcept;
 			[[nodiscard]] int get_display_device_idx() const noexcept;
+
+			void update_size(int new_width, int new_height); // just updates the internals
+
+			void set_size    (int new_width, int new_height); // in pixels
+			void set_position(int new_x,     int new_y);      // in virtual desktop coordinates
+			
+			void close();
+			void maximize();
+			void minimize(); // aka iconify
+			void restore();  // from minimized state
 
 			[[nodiscard]]       Keyboard* get_keyboard()       noexcept;
 			[[nodiscard]] const Keyboard* get_keyboard() const noexcept;

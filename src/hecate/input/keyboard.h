@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iosfwd>
+#include <array>
 
 namespace hecate {
     class Input;
@@ -107,7 +108,9 @@ namespace hecate {
                 home,
                 end,
                 ins,
-                del
+                del,
+
+                __count // not an actual key :P
             };
 
             Keyboard(Input* manager);
@@ -143,7 +146,7 @@ namespace hecate {
         private:
             Input* m_Manager = nullptr;
 
-            bool m_Keys[256] = {};
+            std::array<bool, std::to_underlying(e_Key::__count)> m_Keys;
         };
 
         std::ostream& operator << (std::ostream& os, const Keyboard::e_Key&         key);
