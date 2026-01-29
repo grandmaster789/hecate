@@ -26,7 +26,7 @@ namespace hecate::util {
 		Function             (Function&&) noexcept = default;
 		Function& operator = (Function&&) noexcept = default;
 
-		t_Result operator()(t_Args&&...);
+		t_Result operator()(t_Args... args);
 
 	private:
 		struct Interface {
@@ -39,8 +39,8 @@ namespace hecate::util {
 			Interface             (Interface&&) noexcept = default;
 			Interface& operator = (Interface&&) noexcept = default;
 
-			virtual Interface* clone()           const = 0;
-			virtual t_Result   call(t_Args&&...) const = 0;
+			virtual Interface* clone() const = 0;
+			virtual t_Result   call(t_Args...)       = 0;
 		};
 
 		template <typename Callable>
@@ -63,8 +63,8 @@ namespace hecate::util {
 				return *this;
 			}
 
-			Interface* clone()           const override;
-			t_Result   call(t_Args&&...) const override;
+			Interface* clone() const override;
+			t_Result   call(t_Args...)       override;
 
 			Callable m_StoredFunction;
 		};

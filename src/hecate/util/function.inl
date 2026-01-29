@@ -24,8 +24,8 @@ namespace hecate::util {
 	}
 
 	template <typename T, typename...Args>
-	T Function<T(Args...)>::operator()(Args&&... args) {
-		return m_Storage->call(std::forward<Args>(args)...);
+	T Function<T(Args...)>::operator()(Args... args) {
+		return m_Storage->call(args...);
 	}
 
 	template <typename T, typename...Args>
@@ -60,10 +60,7 @@ namespace hecate::util {
 
 	template <typename T, typename...Args>
 	template <typename Fn>
-	T Function<T(Args...)>::Implementation<Fn>::call(Args&&... args) const {
-		return std::invoke(
-			m_StoredFunction, 
-			std::forward<Args>(args)...
-		);
+	T Function<T(Args...)>::Implementation<Fn>::call(Args... args) {
+		return std::invoke(m_StoredFunction, args...);
 	}
 }
