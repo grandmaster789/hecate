@@ -292,4 +292,99 @@ namespace test {
 		fn = [](int x) { return x - 3; };
 		REQUIRE(fn(5) == 2);
 	}
+
+	TEST_CASE("function_empty_state", "[hecate::util]") {
+		using namespace hecate::util;
+
+		// Default constructed function is empty
+		Function<int(int)> fn1;
+		REQUIRE(fn1.empty());
+		REQUIRE(!fn1);
+
+		// Assigned function is not empty
+		fn1 = [](int x) { return x + 1; };
+		REQUIRE(!fn1.empty());
+		REQUIRE(fn1);
+		REQUIRE(fn1(5) == 6);
+	}
+
+	TEST_CASE("function_empty_call_throws", "[hecate::util]") {
+		using namespace hecate::util;
+
+		Function<int(int)> fn;
+		REQUIRE_THROWS_AS(fn(5), bad_function_call);
+	}
+
+	TEST_CASE("function_perfect_forwarding", "[hecate::util]") {
+		using namespace hecate::util;
+
+		int call_count = 0;
+
+		// Test that references are forwarded properly
+		Function<void(int&)> fn = [&call_count](int& x) {
+			x += 10;
+			call_count++;
+		};
+
+		int value = 5;
+		fn(value);
+		REQUIRE(value == 15);
+		REQUIRE(call_count == 1);
+	}
+
+	TEST_CASE("function_small_object_optimization", "[hecate::util]") {
+		using namespace hecate::util;
+
+		// Small lambda should use inline storage (no heap allocation)
+		int captured = 42;
+		Function<int(int)> small_fn = [captured](int x) {
+			return x + captured;
+		};
+
+		REQUIRE(small_fn(10) == 52);
+
+		// Copy should also work with SBO
+		Function<int(int)> small_fn_copy = small_fn;
+		REQUIRE(small_fn_copy(10) == 52);
+	}
+
+	TEST_CASE("function_large_callable", "[hecate::util]") {
+		using namespace hecate::util;
+
+		// Large lambda with many captures should use heap storage
+		int a = 1, b = 2, c = 3, d = 4, e = 5, f = 6, g = 7, h = 8;
+		Function<int(int)> large_fn = [a, b, c, d, e, f, g, h](int x) {
+			return x + a + b + c + d + e + f + g + h;
+		};
+
+		REQUIRE(large_fn(10) == 46); // 10 + (1+2+3+4+5+6+7+8)
+	}
+
+	TEST_CASE("function_move_semantics", "[hecate::util]") {
+		using namespace hecate::util;
+
+		Function<int(int)> fn1 = [](int x) { return x * 2; };
+		REQUIRE(fn1(5) == 10);
+
+		Function<int(int)> fn2 = std::move(fn1);
+		REQUIRE(fn2(5) == 10);
+		// fn1 is now empty after move
+		REQUIRE(fn1.empty());
+	}
+
+	TEST_CASE("function_concepts_constrain", "[hecate::util]") {
+		using namespace hecate::util;
+
+		// This should compile - correct signature
+		Function<int(int, int)> fn1 = [](int a, int b) { return a + b; };
+		REQUIRE(fn1(3, 4) == 7);
+
+		// This should compile - convertible return type
+		Function<double(int)> fn2 = [](int x) { return x * 2; };
+		REQUIRE(fn2(5) == 10.0);
+
+		// Note: The following would NOT compile due to concepts:
+		// Function<int(int)> bad_fn = [](std::string s) { return 0; }; // Wrong argument type
+		// Function<std::string(int)> bad_fn2 = [](int x) { return x; }; // Incompatible return type
+	}
 }

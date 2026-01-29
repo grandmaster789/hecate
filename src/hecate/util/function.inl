@@ -4,63 +4,117 @@
 #include <utility>    // std::forward
 
 namespace hecate::util {
-	template <typename T, typename...Args>
-	template <typename Fn>
-	Function<T(Args...)>::Function(Fn x) noexcept:
-		m_Storage(std::make_unique<Implementation<decltype(x)>>(x))
+	// Copy constructor
+	template <typename t_Result, typename...t_Args>
+	Function<t_Result(t_Args...)>::Function(const Function& fn) :
+		m_UsesInlineStorage(fn.m_UsesInlineStorage)
 	{
+		if (fn.m_UsesInlineStorage) {
+			reinterpret_cast<const Interface*>(fn.m_InlineStorage)->clone_into(m_InlineStorage);
+		} else if (fn.m_Storage) {
+			m_Storage.reset(fn.m_Storage->clone());
+		}
 	}
 
-	template <typename T, typename...Args>
-	Function<T(Args...)>::Function(const Function& fn):
-		m_Storage(fn.m_Storage->clone())
-	{
-	}
+	// Copy assignment
+	template <typename t_Result, typename...t_Args>
+	Function<t_Result(t_Args...)>& Function<t_Result(t_Args...)>::operator = (const Function<t_Result(t_Args...)>& fn) {
+		if (this != &fn) {
+			destroy();
 
-	template <typename T, typename...Args>
-	Function<T(Args...)>& Function<T(Args...)>::operator = (const Function<T(Args...)>& fn) {
-		m_Storage.reset(fn.m_Storage->clone());
+			m_UsesInlineStorage = fn.m_UsesInlineStorage;
+
+			if (fn.m_UsesInlineStorage) {
+				reinterpret_cast<const Interface*>(fn.m_InlineStorage)->clone_into(m_InlineStorage);
+			} else if (fn.m_Storage) {
+				m_Storage.reset(fn.m_Storage->clone());
+			}
+		}
 		return *this;
 	}
 
-	template <typename T, typename...Args>
-	T Function<T(Args...)>::operator()(Args... args) {
-		return m_Storage->call(args...);
+	// Move constructor
+	template <typename t_Result, typename...t_Args>
+	Function<t_Result(t_Args...)>::Function(Function&& fn) noexcept :
+		m_Storage(std::move(fn.m_Storage)),
+		m_UsesInlineStorage(fn.m_UsesInlineStorage)
+	{
+		if (m_UsesInlineStorage) {
+			std::memcpy(m_InlineStorage, fn.m_InlineStorage, InlineSize);
+			fn.m_UsesInlineStorage = false;
+		}
 	}
 
-	template <typename T, typename...Args>
+	// Move assignment
+	template <typename t_Result, typename...t_Args>
+	Function<t_Result(t_Args...)>& Function<t_Result(t_Args...)>::operator = (Function&& fn) noexcept {
+		if (this != &fn) {
+			destroy();
+
+			m_Storage = std::move(fn.m_Storage);
+			m_UsesInlineStorage = fn.m_UsesInlineStorage;
+
+			if (m_UsesInlineStorage) {
+				std::memcpy(m_InlineStorage, fn.m_InlineStorage, InlineSize);
+				fn.m_UsesInlineStorage = false;
+			}
+		}
+		return *this;
+	}
+
+	// Destructor
+	template <typename t_Result, typename...t_Args>
+	Function<t_Result(t_Args...)>::~Function() {
+		destroy();
+	}
+
+	// Helper to destroy stored callable
+	template <typename t_Result, typename...t_Args>
+	void Function<t_Result(t_Args...)>::destroy() noexcept {
+		if (m_UsesInlineStorage) {
+			get_interface()->~Interface();
+			m_UsesInlineStorage = false;
+		} else {
+			m_Storage.reset();
+		}
+	}
+
+	// Helper to get interface pointer
+	template <typename t_Result, typename...t_Args>
+	typename Function<t_Result(t_Args...)>::Interface* Function<t_Result(t_Args...)>::get_interface() noexcept {
+		if (m_UsesInlineStorage) {
+			return reinterpret_cast<Interface*>(m_InlineStorage);
+		} else {
+			return m_Storage.get();
+		}
+	}
+
+	// Implementation constructor
+	template <typename t_Result, typename...t_Args>
 	template <typename Fn>
-	Function<T(Args...)>::Implementation<Fn>::Implementation(Fn x):
+	Function<t_Result(t_Args...)>::Implementation<Fn>::Implementation(Fn x):
 		m_StoredFunction(std::move(x))
 	{
 	}
 
-	// internal compiler error, we meet again -_-
-	// 
-	//template <typename T, typename...Args>
-	//template <typename Fn>
-	//Function<T(Args...)>::Implementation<Fn>::Implementation(const Implementation& impl) :
-	//	m_StoredFunction(impl.m_StoredFunction)
-	//{
-	//}
-
-	// internal compiler error, we meet again -_-
-	// 
-	//template <typename T, typename...Args>
-	//template <typename Fn>
-	//typename Function<T(Args...)>::Implementation<Fn>& Function<T(Args)>::Implementation<Fn>::operator = (const Implementation& impl) {
-	//	return *this;
-	//}
-
-	template <typename T, typename...Args>
+	// Implementation clone (heap allocation)
+	template <typename t_Result, typename...t_Args>
 	template <typename Fn>
-	Function<T(Args...)>::Interface* Function<T(Args...)>::Implementation<Fn>::clone() const {
+	typename Function<t_Result(t_Args...)>::Interface* Function<t_Result(t_Args...)>::Implementation<Fn>::clone() const {
 		return new Implementation(*this);
 	}
 
-	template <typename T, typename...Args>
+	// Implementation clone_into (placement new for SBO)
+	template <typename t_Result, typename...t_Args>
 	template <typename Fn>
-	T Function<T(Args...)>::Implementation<Fn>::call(Args... args) {
-		return std::invoke(m_StoredFunction, args...);
+	void Function<t_Result(t_Args...)>::Implementation<Fn>::clone_into(void* dest) const {
+		new (dest) Implementation(*this);
+	}
+
+	// Implementation call
+	template <typename t_Result, typename...t_Args>
+	template <typename Fn>
+	t_Result Function<t_Result(t_Args...)>::Implementation<Fn>::call(t_Args... args) {
+		return std::invoke(m_StoredFunction, std::forward<t_Args>(args)...);
 	}
 }
