@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-# try to find vulkan
-#include(cmake/vulkan.cmake)
-
-# use cmake to install vcpkg dependency management
-set(VCPKG_VERSION latest)
+# Automatically set up vcpkg (must be before project())
 include(cmake/vcpkg.cmake)
 
 # make a single reference to the project name

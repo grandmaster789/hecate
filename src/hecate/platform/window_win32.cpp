@@ -394,13 +394,11 @@ namespace {
 		for (size_t i = 0; i < display_devices.size(); ++i) {
 			const auto& x = display_devices[i];
 
-			sstr << std::vformat(
+			sstr << std::format(
 				"\t[#{}]: {} {}\n",
-				std::make_format_args(
-					i,
-					hecate::platform::to_string(x.DeviceString),
-					hecate::platform::to_string(x.DeviceID)
-				)
+				i,
+				hecate::platform::to_string(x.DeviceString),
+				hecate::platform::to_string(x.DeviceID)
 			);
 		}
 
